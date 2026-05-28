@@ -1,0 +1,62 @@
+Projects:
+
+% \textbf{Network Data Transfer Capacity $\mid$ Prof. Ashish Chiplunkar \& Prof. Naveen Garg}\hfill\textit{(Oct 2022 - Oct 2022)}\\
+% - Implemented a modified version of Dijkstra's Algorithm and Heap to analyze the maximum capacity of data transfer.\\
+% - Achieved an optimized time complexity of $O(m.log(m))$, where m represents the number of links in a network of routers.
+
+% \textbf{Pattern Matching $\mid$ Prof. Ashish Chiplunkar \& Prof. Naveen Garg} \hfill\textit{(October 2022 - November 2022)}\\
+% - Implemented a program using Rabin-Karp Algorithm, to find all the occurrences of a desired pattern in a given string.\\
+% - Implemented a modified version of the program, while considering the presence of the wildcard characters.\\
+% -Implemented a Python program to find all the indices of pattern in a text using modified Knuth-Morris-Pratt Algorithm
+% -Achieved O(n + m) complexity better than the Naive algorithm(O(n ∗ m)) where n is text length and m is pattern length
+% -Optimized the working memory to O(log(n) + log(m)) by using random prime numbers with less false positives
+
+% \textbf{Analysing Data to Identify Cyclone Features $\mid$ Prof. Samiran Mandal} \hfill\textit{(March 2023 - March 2023)}\\
+% - Analysed GHRSST and HYCOM datasets from APDRC to study trends in weather at different locations on ocean surface.\\
+% - Identified the location of `Severe Cyclonic Storm' for a given cyclone, halocline and thermocline, using the datasets.\\
+% - Performed linear regression in Matlab, revealing a steady rise of 0.0365C/year, indicating the impact of global warming.\\
+% - Conducted comprehensive Sea Surface Temperature ( SST ) Analysis in the Bay of Bengal from 2007 to 2022.\\
+
+% \textbf{ODI Winner Predictor $\mid$ Personal Project} \hfill \textit{(October 2023 - November 2023)}\\
+% - Developed a machine learning model for predicting the winner of ODI cricket matches using Random Forest Classifier.\\
+% - The Random Forest Classifier was trained on comprehensive data sets encompassing historical ODI cricket match statistics.\\
+
+% \textbf{Particle Collision Simulator $\mid$ Prof. Ashish Chiplunkar \& Prof. Naveen Garg} \hfill\textit{(August 2022 - September 2022)}\\
+% - Designed a Particle Collision Simulator that simulates the collision of particles with a given set of parameters.\\
+% - Simulator can compute all possible combinations of particle collisions along with their time and coordinates of collision
+
+% \textbf{Python Interpreter/ Advanced Python Interpreter $\mid$ Prof. Rahul Narain} \hfill \textit{(March 2022 - March 2022)}\\
+% - Analysed the way data is stored in computers and designed a program to simulate the same efficiently for given inputs.\\
+% - Implemented a Python interpreter to handle commands with limited complex syntax, simulating the execution of Python
+
+% \textbf{Pattern Matching $\mid$ Prof. Ashish Chiplunkar \& Prof. Naveen Garg} \hfill\textit{(October 2022 - November 2022)}\\
+% - Implemented a program using the Rabin-Karp Algorithm to find all the occurrences of a desired pattern in a given test.\\
+% - Achieved O(n+m) time complexity, better than the Naive Algorithm ($O(n*m)$) where n is text and m is pattern length.\\
+% - Optimized working memory to $O(log(n)+log(m))$ using random primes, while minimizing the probability of false positives.
+
+
+\textbf{Health Risk Prediction Model for Obesity and Cardiovascular Disease } \hfill \textit{(Jan 2024 - Feb 2024)}\\
+- Developed machine learning models to predict \textbf{the risk of Obesity and CVD} based on key health and lifestyle factors\\
+- Trained the machine learning models using Random Forest and Light Gradient Boosting Machine (\textbf{LGBM}) algorithms\\
+- Combined it with feature engineering techniques to optimize model performance, achieving an impressive accuracy of $\textbf{91\%}$
+
+\textbf{Virtual Memory Simulator - TLB Allocator $\mid$ Prof. Ashutosh Rai}\hfill\textit{(Aug 2024 - Sept 2024)} 
+\href{https://github.com/khushvind/Virtual-Memory-Simulator-TLB_Allocator}{\raisebox{-0.05\height}\faGithub}\\
+- Developed a simulator that models the behavior of four \textbf{TLB} replacement algorithms, \textbf{FIFO}, \textbf{LIFO}, \textbf{LRU}, and \textbf{Optimal}\\
+- Utilized \textbf{low-level system} calls to manage heap memory, handling memory requests dynamically with custom algorithms\\
+- Implemented a \textbf{custom memory allocator} that replicates the functionality of standard \textbf{malloc}, \textbf{calloc}, and \textbf{free} in C\\
+
+\textbf{Dynamic CPU Process Scheduling Algorithms in C $\mid$ Prof. Ashutosh Rai}\hfill\textit{(Aug 2024 - Sept 2024)} \href{https://github.com/khushvind/CPU-Process-Scheduler}{\raisebox{-0.05\height}\faGithub}\\
+- Developed a CPU Process Scheduler, implementing key scheduling algorithms including \textbf{FCFS}, \textbf{RR}, \textbf{MLFQ}, and \textbf{SJF}\\
+- Implemented \textbf{real-time} input handling, demonstrating proficiency in event-driven programming and I/O management\\
+- Generated detailed performance metrics (burst time, turnaround time, waiting time, and response time) for each scheduler\\
+
+% \textbf{Real-Time Disaster Recognition through Twitter Sentiment Analysis using BERT} \hfill \textit{(Apr 2024 - May 2024)}\\
+% - Conducted \textbf{EDA} to examine tweet distributions, uncovering essential patterns and trends in data to guide data cleaning\\
+% - Performed extensive data cleaning, by identifying and removing common \textbf{stopwords}, emojis, urls, special characters etc\\
+% - Fine-tuned \textbf{BERT} on the specific task of disaster tweet classification to achieve an impressive accuracy of more than $\textbf{87\%}$
+
+
+% \textbf{Particle Collision Simulator $\mid$ Prof. Ashish Chiplunkar \& Prof. Naveen Garg} \hfill\textit{(Aug 2022 - Sept 2022)} \href{https://github.com/khushvind/COL106-Assignments/tree/main/Assignment%202}{\raisebox{-0.05\height}\faGithub}\\
+% - Developed a Particle Collision Simulator to model particle interactions and extract information from the first m collisions\\
+% - Implemented a custom priority queue to handle queries in O(n + m.log(n)), with an accessor function for O(1) searches

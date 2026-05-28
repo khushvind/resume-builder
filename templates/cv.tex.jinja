@@ -1,0 +1,122 @@
+\documentclass[a4paper,10pt]{article}
+
+\usepackage{url}
+\usepackage{parskip}
+
+%other packages for formatting
+\RequirePackage{color}
+\RequirePackage{graphicx}
+\usepackage[usenames,dvipsnames]{xcolor}
+\usepackage[scale=0.9]{geometry}
+
+%tabularx environment
+\usepackage{tabularx}
+
+%for lists within experience section
+\usepackage{enumitem}
+
+% centered version of 'X' col. type
+\newcolumntype{C}{>{\centering\arraybackslash}X}
+
+%to prevent spillover of tabular into next pages
+\usepackage{supertabular}
+\usepackage{tabularx}
+\newlength{\fullcollw}
+\setlength{\fullcollw}{0.47\textwidth}
+
+%custom \section
+\usepackage{titlesec}
+\usepackage{multicol}
+\usepackage{multirow}
+
+%CV Sections inspired by:
+%http://stefano.italians.nl/archives/26
+\titleformat{\section}{\Large\scshape\raggedright}{}{0em}{}[\titlerule]
+\titlespacing{\section}{0pt}{0pt}{10pt}
+
+%Setup hyperref package, and colours for links
+\usepackage[unicode, draft=false]{hyperref}
+\definecolor{linkcolour}{rgb}{0,0.2,0.6}
+\hypersetup{colorlinks,breaklinks,urlcolor=linkcolour,linkcolor=linkcolour}
+\usepackage{float}
+
+%for social icons
+\usepackage{fontawesome5}
+
+\pagestyle{empty}
+
+\begin{document}
+\fontfamily{cmr}\selectfont
+%----------HEADING-----------------
+
+\parbox{\dimexpr\linewidth\relax}{
+    \parbox{0.6\linewidth}{
+        \textbf{\LARGE {{ data.name | latex_escape }}}\\[4pt]
+        {{ data.course | latex_escape }}\\
+        {{ data.branch | latex_escape }}
+    }
+    \hfill
+    \parbox{0.35\linewidth}{
+        \raggedleft
+        {% if data.show_contact.phone %}{{ data.phone | latex_escape }}\\{% endif %}
+        {% if data.show_contact.email %}\href{mailto:{{ data.email | latex_escape }}}{ {{ data.email | latex_escape }} }\\{% endif %}
+        {% if data.show_contact.linkedin %}\href{ {{- data.linkedin | latex_url -}} }{\faLinkedin\ {{ data.linkedin | latex_escape }}}\\{% endif %}
+        {% if data.show_contact.github %}\href{ {{- data.github | latex_url -}} }{\faGithub\ {{ data.github | latex_escape }}}{% endif %}
+    }
+}
+
+%----------------------------------------------------------------------------------------
+% EXPERIENCE SECTIONS
+%----------------------------------------------------------------------------------------
+
+{% if data.show_sections.academic %}
+\section{\textbf{Academic Details}}
+\setlength{\tabcolsep}{13pt}
+
+\begin{tabularx}{\linewidth}{l  X  X  r}
+\centering
+\textbf{Year} & \textbf{Degree/Course} & \textbf{Institute} & \textbf{GPA/Marks(\%)} \\
+{% for row in data.academic_details %}
+{{ row.year | latex_escape }} & {{ row.degree | latex_escape }} & {{ row.institute | latex_escape }} & {{ row.marks | latex_escape }} \\
+{% endfor %}
+\end{tabularx}
+{% endif %}
+
+{% if data.show_sections.experience %}
+\section{\textbf{Experience}}
+{% for item in data.experience %}
+\textbf{ {{ item.title | latex_escape }} }: \textit{ {{ item.role | latex_escape }} }\hfill\textit{ {{ item.duration | latex_escape }} }\\
+{% for point in item.points %}
+- {{ point | latex_escape }}\\
+{% endfor %}
+{% endfor %}
+{% endif %}
+
+{% if data.show_sections.internships %}
+\section{\textbf{Internships}}
+{% for item in data.internships %}
+\textbf{ {{ item.title | latex_escape }} }: \textit{ {{ item.role | latex_escape }} }\hfill\textit{ {{ item.duration | latex_escape }} }\\
+{% for point in item.points %}
+- {{ point | latex_escape }}\\
+{% endfor %}
+{% endfor %}
+{% endif %}
+
+{% if data.show_sections.projects %}
+\section{\textbf{Key Projects}}
+{% for item in data.projects %}
+\textbf{ {{ item.title | latex_escape }} }{% if item.subtitle %} $\mid$ {{ item.subtitle | latex_escape }}{% endif %}\hfill\textit{ {{ item.duration | latex_escape }} } {% if item.url %}\href{ {{- item.url | latex_url -}} }{\raisebox{-0.05\height}{\faGithub}}{% endif %}\\
+{% for point in item.points %}
+- {{ point | latex_escape }}\\
+{% endfor %}
+{% endfor %}
+{% endif %}
+
+{% if data.show_sections.skills %}
+\section{\textbf{Skills}}
+\textbf{Programming Languages:} {{ data.skills.languages | latex_escape }} $\mid$ \textbf{Libraries:} {{ data.skills.libraries | latex_escape }} $\mid$ \textbf{Tools:} {{ data.skills.tools | latex_escape }}
+{% endif %}
+
+\vfill
+
+\end{document}

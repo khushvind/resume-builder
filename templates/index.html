@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Resume Builder</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="panel form-panel">
+        <h1>Resume Builder</h1>
+        <p>Fill details, toggle sections, and preview your A4 PDF on the right.</p>
+
+        <form id="resume-form">
+          <h2>Header</h2>
+          <label>Name <input type="text" id="name" required /></label>
+          <label>Course <input type="text" id="course" required /></label>
+          <label>Branch <input type="text" id="branch" required /></label>
+
+          <div class="contact-grid">
+            <label class="contact-field">
+              <span>Phone</span>
+              <input type="text" id="phone" required />
+              <input type="checkbox" id="show-phone" checked />
+            </label>
+            <label class="contact-field">
+              <span>Email</span>
+              <input type="email" id="email" required />
+              <input type="checkbox" id="show-email" checked />
+            </label>
+            <label class="contact-field">
+              <span>LinkedIn URL</span>
+              <input type="url" id="linkedin" required />
+              <input type="checkbox" id="show-linkedin" checked />
+            </label>
+            <label class="contact-field">
+              <span>GitHub URL</span>
+              <input type="url" id="github" required />
+              <input type="checkbox" id="show-github" checked />
+            </label>
+          </div>
+
+          <h2>Section Toggles</h2>
+          <div class="toggles">
+            <div class="toggle-row"><span>Academic Details</span><input type="checkbox" id="show-academic" checked /></div>
+            <div class="toggle-row"><span>Experience</span><input type="checkbox" id="show-experience" checked /></div>
+            <div class="toggle-row"><span>Internships</span><input type="checkbox" id="show-internships" checked /></div>
+            <div class="toggle-row"><span>Key Projects</span><input type="checkbox" id="show-projects" checked /></div>
+            <div class="toggle-row"><span>Skills</span><input type="checkbox" id="show-skills" checked /></div>
+          </div>
+
+          <h2>Academic Details</h2>
+          <p class="hint">One row per line: year | degree | institute | marks</p>
+          <textarea id="academic" rows="5"></textarea>
+
+          <h2>Experience</h2>
+          <p class="hint">Entry format (blank line separates entries):</p>
+          <p class="hint">title | role | duration</p>
+          <p class="hint">- bullet point</p>
+          <textarea id="experience" rows="8"></textarea>
+
+          <h2>Internships</h2>
+          <textarea id="internships" rows="8"></textarea>
+
+          <h2>Key Projects</h2>
+          <p class="hint">title | subtitle | duration | url</p>
+          <textarea id="projects" rows="8"></textarea>
+
+          <h2>Skills</h2>
+          <label>Languages <input type="text" id="skills-languages" /></label>
+          <label>Libraries <input type="text" id="skills-libraries" /></label>
+          <label>Tools <input type="text" id="skills-tools" /></label>
+
+          <div class="actions">
+            <button type="submit">Render Preview</button>
+            <a id="download-link" class="button secondary" href="#" target="_blank" rel="noopener">Download PDF</a>
+          </div>
+        </form>
+        <pre id="error-box" class="error"></pre>
+      </section>
+
+      <section class="panel preview-panel">
+        <div class="preview-header">
+          <h2>A4 Preview</h2>
+          <span id="status">Waiting for first render...</span>
+        </div>
+        <iframe id="pdf-frame" title="Resume PDF preview"></iframe>
+      </section>
+    </main>
+
+    <script>
+      const defaults = {{ default_data | tojson }};
+
+      const ids = {
+        name: document.getElementById("name"),
+        course: document.getElementById("course"),
+        branch: document.getElementById("branch"),
+        phone: document.getElementById("phone"),
+        email: document.getElementById("email"),
+        linkedin: document.getElementById("linkedin"),
+        github: document.getElementById("github"),
+        showPhone: document.getElementById("show-phone"),
+        showEmail: document.getElementById("show-email"),
+        showLinkedin: document.getElementById("show-linkedin"),
+        showGithub: document.getElementById("show-github"),
+        academic: document.getElementById("academic"),
+        experience: document.getElementById("experience"),
+        internships: document.getElementById("internships"),
+        projects: document.getElementById("projects"),
+        skillsLanguages: document.getElementById("skills-languages"),
+        skillsLibraries: document.getElementById("skills-libraries"),
+        skillsTools: document.getElementById("skills-tools"),
+        showAcademic: document.getElementById("show-academic"),
+        showExperience: document.getElementById("show-experience"),
+        showInternships: document.getElementById("show-internships"),
+        showProjects: document.getElementById("show-projects"),
+        showSkills: document.getElementById("show-skills"),
+        form: document.getElementById("resume-form"),
+        frame: document.getElementById("pdf-frame"),
+        status: document.getElementById("status"),
+        error: document.getElementById("error-box"),
+        download: document.getElementById("download-link"),
+      };
+
+      function toAcademicText(rows) {
+        return rows.map((r) => [r.year, r.degree, r.institute, r.marks].join(" | ")).join("\n");
+      }
+
+      function toEntriesText(rows, withUrl = false) {
+        return rows
+          .map((entry) => {
+            const header = withUrl
+              ? [entry.title, entry.subtitle || "", entry.duration, entry.url || ""].join(" | ")
+              : [entry.title, entry.role, entry.duration].join(" | ");
+            const points = (entry.points || []).map((p) => `- ${p}`).join("\n");
+            return `${header}\n${points}`;
+          })
+          .join("\n\n");
+      }
+
+      function parseAcademic(input) {
+        return input
+          .split("\n")
+          .map((line) => line.trim())
+          .filter(Boolean)
+          .map((line) => {
+            const [year = "", degree = "", institute = "", marks = ""] = line.split("|").map((s) => s.trim());
+            return { year, degree, institute, marks };
+          });
+      }
+
+      function parseEntries(input, withUrl = false) {
+        return input
+          .split(/\n\s*\n/g)
+          .map((chunk) => chunk.trim())
+          .filter(Boolean)
+          .map((chunk) => {
+            const lines = chunk.split("\n").map((line) => line.trim()).filter(Boolean);
+            const header = lines[0] || "";
+            const parts = header.split("|").map((s) => s.trim());
+            const points = lines.slice(1).map((line) => line.replace(/^-\s*/, "")).filter(Boolean);
+            if (withUrl) {
+              const [title = "", subtitle = "", duration = "", url = ""] = parts;
+              return { title, subtitle, duration, url, points };
+            }
+            const [title = "", role = "", duration = ""] = parts;
+            return { title, role, duration, points };
+          });
+      }
+
+      function loadDefaults() {
+        ids.name.value = defaults.name;
+        ids.course.value = defaults.course;
+        ids.branch.value = defaults.branch;
+        ids.phone.value = defaults.phone;
+        ids.email.value = defaults.email;
+        ids.linkedin.value = defaults.linkedin;
+        ids.github.value = defaults.github;
+
+        ids.showPhone.checked = defaults.show_contact.phone;
+        ids.showEmail.checked = defaults.show_contact.email;
+        ids.showLinkedin.checked = defaults.show_contact.linkedin;
+        ids.showGithub.checked = defaults.show_contact.github;
+
+        ids.showAcademic.checked = defaults.show_sections.academic;
+        ids.showExperience.checked = defaults.show_sections.experience;
+        ids.showInternships.checked = defaults.show_sections.internships;
+        ids.showProjects.checked = defaults.show_sections.projects;
+        ids.showSkills.checked = defaults.show_sections.skills;
+
+        ids.academic.value = toAcademicText(defaults.academic_details || []);
+        ids.experience.value = toEntriesText(defaults.experience || []);
+        ids.internships.value = toEntriesText(defaults.internships || []);
+        ids.projects.value = toEntriesText(defaults.projects || [], true);
+
+        ids.skillsLanguages.value = defaults.skills.languages || "";
+        ids.skillsLibraries.value = defaults.skills.libraries || "";
+        ids.skillsTools.value = defaults.skills.tools || "";
+      }
+
+      function buildPayload() {
+        return {
+          name: ids.name.value.trim(),
+          course: ids.course.value.trim(),
+          branch: ids.branch.value.trim(),
+          phone: ids.phone.value.trim(),
+          email: ids.email.value.trim(),
+          linkedin: ids.linkedin.value.trim(),
+          github: ids.github.value.trim(),
+          show_contact: {
+            phone: ids.showPhone.checked,
+            email: ids.showEmail.checked,
+            linkedin: ids.showLinkedin.checked,
+            github: ids.showGithub.checked,
+          },
+          academic_details: parseAcademic(ids.academic.value),
+          experience: parseEntries(ids.experience.value),
+          internships: parseEntries(ids.internships.value),
+          projects: parseEntries(ids.projects.value, true),
+          skills: {
+            languages: ids.skillsLanguages.value.trim(),
+            libraries: ids.skillsLibraries.value.trim(),
+            tools: ids.skillsTools.value.trim(),
+          },
+          show_sections: {
+            academic: ids.showAcademic.checked,
+            experience: ids.showExperience.checked,
+            internships: ids.showInternships.checked,
+            projects: ids.showProjects.checked,
+            skills: ids.showSkills.checked,
+          },
+        };
+      }
+
+      let debounceHandle;
+      async function renderResume() {
+        ids.status.textContent = "Rendering...";
+        ids.error.textContent = "";
+
+        const response = await fetch("/render", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(buildPayload()),
+        });
+
+        const body = await response.json();
+        if (!response.ok || !body.ok) {
+          ids.status.textContent = "Render failed";
+          ids.error.textContent = body.log || body.error || "Unknown error";
+          return;
+        }
+
+        ids.status.textContent = "Preview updated";
+        ids.frame.src = `${body.pdf_url}#toolbar=0&navpanes=0&scrollbar=1`;
+        ids.download.href = body.download_url;
+      }
+
+      function scheduleRender() {
+        clearTimeout(debounceHandle);
+        debounceHandle = setTimeout(() => {
+          renderResume().catch((err) => {
+            ids.status.textContent = "Render failed";
+            ids.error.textContent = err.message;
+          });
+        }, 700);
+      }
+
+      ids.form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        renderResume().catch((err) => {
+          ids.status.textContent = "Render failed";
+          ids.error.textContent = err.message;
+        });
+      });
+
+      ids.form.addEventListener("input", scheduleRender);
+      ids.form.addEventListener("change", scheduleRender);
+
+      loadDefaults();
+      scheduleRender();
+    </script>
+  </body>
+</html>
