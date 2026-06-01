@@ -41,48 +41,65 @@
             </label>
           </div>
 
-          <h2>Section Toggles</h2>
-          <div class="toggles">
-            <div class="toggle-row"><span>Academic Details</span><input type="checkbox" id="show-academic" checked /></div>
-            <div class="toggle-row"><span>Experience</span><input type="checkbox" id="show-experience" checked /></div>
-            <div class="toggle-row"><span>Internships</span><input type="checkbox" id="show-internships" checked /></div>
-            <div class="toggle-row"><span>Key Projects</span><input type="checkbox" id="show-projects" checked /></div>
-            <div class="toggle-row"><span>Skills</span><input type="checkbox" id="show-skills" checked /></div>
-          </div>
+          <h2 class="section-heading">
+            <label class="section-toggle">
+              <span>Academic Details</span>
+              <input type="checkbox" id="show-academic" checked />
+            </label>
+            <button type="button" class="section-add" data-add-entry="academic" aria-label="Add academic">+</button>
+          </h2>
+          <p class="hint">Add one academic record at a time.</p>
+          <div id="academic-entries" class="entry-list" data-section="academic"></div>
 
-          <h2>Academic Details</h2>
-          <p class="hint">One row per line: year | degree | institute | marks</p>
-          <textarea id="academic" rows="5"></textarea>
-
-          <h2>Experience</h2>
+          <h2 class="section-heading">
+            <label class="section-toggle">
+              <span>Experience</span>
+              <input type="checkbox" id="show-experience" checked />
+            </label>
+            <button type="button" class="section-add" data-add-entry="experience" aria-label="Add experience">+</button>
+          </h2>
           <p class="hint">Entry format (blank line separates entries):</p>
-          <p class="hint">title | role | duration</p>
-          <p class="hint">- bullet point</p>
-          <textarea id="experience" rows="8"></textarea>
+          <div id="experience-entries" class="entry-list" data-section="experience"></div>
 
-          <h2>Internships</h2>
-          <textarea id="internships" rows="8"></textarea>
+          <h2 class="section-heading">
+            <label class="section-toggle">
+              <span>Internships</span>
+              <input type="checkbox" id="show-internships" checked />
+            </label>
+            <button type="button" class="section-add" data-add-entry="internships" aria-label="Add internship">+</button>
+          </h2>
+          <div id="internships-entries" class="entry-list" data-section="internships"></div>
 
-          <h2>Key Projects</h2>
-          <p class="hint">title | subtitle | duration | url</p>
-          <textarea id="projects" rows="8"></textarea>
+          <h2 class="section-heading">
+            <label class="section-toggle">
+              <span>Key Projects</span>
+              <input type="checkbox" id="show-projects" checked />
+            </label>
+            <button type="button" class="section-add" data-add-entry="projects" aria-label="Add project">+</button>
+          </h2>
+          <div id="project-entries" class="entry-list" data-section="projects"></div>
 
-          <h2>Skills</h2>
+          <h2 class="section-heading">
+            <label class="section-toggle">
+              <span>Skills</span>
+              <input type="checkbox" id="show-skills" checked />
+            </label>
+          </h2>
           <label>Languages <input type="text" id="skills-languages" /></label>
           <label>Libraries <input type="text" id="skills-libraries" /></label>
           <label>Tools <input type="text" id="skills-tools" /></label>
 
-          <div class="actions">
-            <button type="submit">Render Preview</button>
-            <a id="download-link" class="button secondary" href="#" target="_blank" rel="noopener">Download PDF</a>
-          </div>
+          <div class="actions" aria-hidden="true"></div>
         </form>
         <pre id="error-box" class="error"></pre>
       </section>
 
       <section class="panel preview-panel">
         <div class="preview-header">
-          <h2>A4 Preview</h2>
+          <div class="preview-actions">
+            <button id="render-top" class="button">Render Preview</button>
+            <a id="download-link" class="button secondary" href="#" target="_blank" rel="noopener">Download PDF</a>
+          </div>
           <span id="status">Waiting for first render...</span>
         </div>
         <iframe id="pdf-frame" title="Resume PDF preview"></iframe>
@@ -104,10 +121,12 @@
         showEmail: document.getElementById("show-email"),
         showLinkedin: document.getElementById("show-linkedin"),
         showGithub: document.getElementById("show-github"),
-        academic: document.getElementById("academic"),
+        academicEntries: document.getElementById("academic-entries"),
         experience: document.getElementById("experience"),
         internships: document.getElementById("internships"),
-        projects: document.getElementById("projects"),
+        experienceEntries: document.getElementById("experience-entries"),
+        internshipEntries: document.getElementById("internships-entries"),
+        projectEntries: document.getElementById("project-entries"),
         skillsLanguages: document.getElementById("skills-languages"),
         skillsLibraries: document.getElementById("skills-libraries"),
         skillsTools: document.getElementById("skills-tools"),
@@ -121,6 +140,7 @@
         status: document.getElementById("status"),
         error: document.getElementById("error-box"),
         download: document.getElementById("download-link"),
+        renderTop: document.getElementById("render-top"),
       };
 
       function toAcademicText(rows) {
@@ -128,15 +148,262 @@
       }
 
       function toEntriesText(rows, withUrl = false) {
-        return rows
+        return (rows || [])
           .map((entry) => {
             const header = withUrl
               ? [entry.title, entry.subtitle || "", entry.duration, entry.url || ""].join(" | ")
               : [entry.title, entry.role, entry.duration].join(" | ");
-            const points = (entry.points || []).map((p) => `- ${p}`).join("\n");
+            const points = (entry.points || []).map((point) => `- ${point}`).join("\n");
             return `${header}\n${points}`;
           })
           .join("\n\n");
+      }
+
+      function createPointRow(value = "") {
+        const row = document.createElement("div");
+        row.className = "point-row";
+
+        const input = document.createElement("input");
+        input.type = "text";
+        input.className = "point-input";
+        input.value = value;
+        input.placeholder = "Point";
+
+        const removeButton = document.createElement("button");
+        removeButton.type = "button";
+        removeButton.className = "row-remove";
+        removeButton.textContent = "×";
+        removeButton.setAttribute("aria-label", "Remove point");
+        removeButton.addEventListener("click", () => row.remove());
+
+        row.append(input, removeButton);
+        return row;
+      }
+
+      function createEntryCard(section, entry = {}) {
+        const card = document.createElement("div");
+        card.className = "entry-card";
+        card.dataset.section = section;
+
+        const header = document.createElement("div");
+        header.className = "entry-card-header";
+
+        const titleField = document.createElement("label");
+        titleField.className = "entry-field";
+        const titleSpan = document.createElement("span");
+        titleSpan.textContent = "Heading";
+        const titleInput = document.createElement("input");
+        titleInput.type = "text";
+        titleInput.className = "entry-input";
+        titleInput.value = entry.title || "";
+        titleInput.placeholder = "Company / Organization / Project";
+        titleField.append(titleSpan, titleInput);
+
+        header.append(titleField);
+
+        if (section === "academic") {
+          const yearField = document.createElement("label");
+          yearField.className = "entry-field";
+          const yearSpan = document.createElement("span");
+          yearSpan.textContent = "Year";
+          const yearInput = document.createElement("input");
+          yearInput.type = "text";
+          yearInput.className = "entry-input";
+          yearInput.value = entry.year || "";
+          yearInput.placeholder = "2024";
+          yearField.append(yearSpan, yearInput);
+
+          const degreeField = document.createElement("label");
+          degreeField.className = "entry-field";
+          const degreeSpan = document.createElement("span");
+          degreeSpan.textContent = "Degree";
+          const degreeInput = document.createElement("input");
+          degreeInput.type = "text";
+          degreeInput.className = "entry-input";
+          degreeInput.value = entry.degree || "";
+          degreeInput.placeholder = "B.Sc / M.Sc / B.Tech";
+          degreeField.append(degreeSpan, degreeInput);
+
+          const instField = document.createElement("label");
+          instField.className = "entry-field";
+          const instSpan = document.createElement("span");
+          instSpan.textContent = "Institute";
+          const instInput = document.createElement("input");
+          instInput.type = "text";
+          instInput.className = "entry-input";
+          instInput.value = entry.institute || "";
+          instInput.placeholder = "College / University";
+          instField.append(instSpan, instInput);
+
+          const marksField = document.createElement("label");
+          marksField.className = "entry-field";
+          const marksSpan = document.createElement("span");
+          marksSpan.textContent = "Marks";
+          const marksInput = document.createElement("input");
+          marksInput.type = "text";
+          marksInput.className = "entry-input";
+          marksInput.value = entry.marks || "";
+          marksInput.placeholder = "GPA / Percentage";
+          marksField.append(marksSpan, marksInput);
+
+          header.append(yearField, degreeField, instField, marksField);
+        } else if (section === "experience" || section === "internships") {
+          const roleField = document.createElement("label");
+          roleField.className = "entry-field";
+          const roleSpan = document.createElement("span");
+          roleSpan.textContent = "Role";
+          const roleInput = document.createElement("input");
+          roleInput.type = "text";
+          roleInput.className = "entry-input";
+          roleInput.value = entry.role || "";
+          roleInput.placeholder = "Role / Title";
+          roleField.append(roleSpan, roleInput);
+
+          const durationField = document.createElement("label");
+          durationField.className = "entry-field";
+          const durationSpan = document.createElement("span");
+          durationSpan.textContent = "Duration";
+          const durationInput = document.createElement("input");
+          durationInput.type = "text";
+          durationInput.className = "entry-input";
+          durationInput.value = entry.duration || "";
+          durationInput.placeholder = "(Jan 2025 - Present)";
+          durationField.append(durationSpan, durationInput);
+
+          header.append(roleField, durationField);
+        } else {
+          const subtitleField = document.createElement("label");
+          subtitleField.className = "entry-field";
+          const subtitleSpan = document.createElement("span");
+          subtitleSpan.textContent = "Subtitle";
+          const subtitleInput = document.createElement("input");
+          subtitleInput.type = "text";
+          subtitleInput.className = "entry-input";
+          subtitleInput.value = entry.subtitle || "";
+          subtitleInput.placeholder = "Short descriptor";
+          subtitleField.append(subtitleSpan, subtitleInput);
+
+          const durationField = document.createElement("label");
+          durationField.className = "entry-field";
+          const durationSpan = document.createElement("span");
+          durationSpan.textContent = "Duration";
+          const durationInput = document.createElement("input");
+          durationInput.type = "text";
+          durationInput.className = "entry-input";
+          durationInput.value = entry.duration || "";
+          durationInput.placeholder = "(Jan 2025 - Mar 2025)";
+          durationField.append(durationSpan, durationInput);
+
+          const urlField = document.createElement("label");
+          urlField.className = "entry-field";
+          const urlSpan = document.createElement("span");
+          urlSpan.textContent = "URL";
+          const urlInput = document.createElement("input");
+          urlInput.type = "url";
+          urlInput.className = "entry-input";
+          urlInput.value = entry.url || "";
+          urlInput.placeholder = "https://...";
+          urlField.append(urlSpan, urlInput);
+
+          header.append(subtitleField, durationField, urlField);
+        }
+
+        let pointsBox = null;
+        if (section !== "academic") {
+          pointsBox = document.createElement("div");
+          pointsBox.className = "points-box";
+
+          const pointsHeader = document.createElement("div");
+          pointsHeader.className = "points-header";
+          const pointsTitle = document.createElement("span");
+          pointsTitle.textContent = "Points";
+          const addPointButton = document.createElement("button");
+          addPointButton.type = "button";
+          addPointButton.className = "point-add";
+          addPointButton.textContent = "+";
+          addPointButton.setAttribute("aria-label", "Add point");
+          pointsHeader.append(pointsTitle, addPointButton);
+
+          const pointsList = document.createElement("div");
+          pointsList.className = "points-list";
+
+          const pointValues = Array.isArray(entry.points) && entry.points.length ? entry.points : [""];
+          pointValues.forEach((point) => pointsList.append(createPointRow(point)));
+
+          addPointButton.addEventListener("click", () => {
+            pointsList.append(createPointRow());
+          });
+
+          pointsBox.append(pointsHeader, pointsList);
+        }
+
+        const cardActions = document.createElement("div");
+        cardActions.className = "entry-actions";
+        const removeEntryButton = document.createElement("button");
+        removeEntryButton.type = "button";
+        removeEntryButton.className = "entry-remove";
+        removeEntryButton.textContent = "Remove";
+        removeEntryButton.addEventListener("click", () => card.remove());
+        cardActions.append(removeEntryButton);
+
+        if (pointsBox) card.append(header, pointsBox, cardActions);
+        else card.append(header, cardActions);
+        return card;
+      }
+
+      function renderEntrySection(section, rows) {
+        let container = null;
+        if (section === "experience") container = ids.experienceEntries;
+        else if (section === "internships") container = ids.internshipEntries;
+        else if (section === "projects") container = ids.projectEntries;
+        else if (section === "academic") container = ids.academicEntries;
+        if (!container) return;
+        container.innerHTML = "";
+        const list = rows && rows.length ? rows : [{}];
+        list.forEach((row) => container.append(createEntryCard(section, row)));
+      }
+
+      function collectEntrySection(section) {
+        let container = null;
+        if (section === "experience") container = ids.experienceEntries;
+        else if (section === "internships") container = ids.internshipEntries;
+        else if (section === "projects") container = ids.projectEntries;
+        else if (section === "academic") container = ids.academicEntries;
+        if (!container) return [];
+
+        return [...container.querySelectorAll(`.entry-card[data-section="${section}"]`)].map((card) => {
+          const inputs = [...card.querySelectorAll(".entry-input")];
+          const points = [...card.querySelectorAll(".point-input")].map((input) => input.value.trim()).filter(Boolean);
+
+          if (section === "academic") {
+            const [yearInput, degreeInput, instInput, marksInput] = inputs;
+            return {
+              year: yearInput?.value.trim() || "",
+              degree: degreeInput?.value.trim() || "",
+              institute: instInput?.value.trim() || "",
+              marks: marksInput?.value.trim() || "",
+            };
+          }
+
+          if (section === "experience" || section === "internships") {
+            const [titleInput, roleInput, durationInput] = inputs;
+            return {
+              title: titleInput?.value.trim() || "",
+              role: roleInput?.value.trim() || "",
+              duration: durationInput?.value.trim() || "",
+              points,
+            };
+          }
+
+          const [titleInput, subtitleInput, durationInput, urlInput] = inputs;
+          return {
+            title: titleInput?.value.trim() || "",
+            subtitle: subtitleInput?.value.trim() || "",
+            duration: durationInput?.value.trim() || "",
+            url: urlInput?.value.trim() || "",
+            points,
+          };
+        });
       }
 
       function parseAcademic(input) {
@@ -189,10 +456,10 @@
         ids.showProjects.checked = defaults.show_sections.projects;
         ids.showSkills.checked = defaults.show_sections.skills;
 
-        ids.academic.value = toAcademicText(defaults.academic_details || []);
-        ids.experience.value = toEntriesText(defaults.experience || []);
-        ids.internships.value = toEntriesText(defaults.internships || []);
-        ids.projects.value = toEntriesText(defaults.projects || [], true);
+        renderEntrySection("academic", defaults.academic_details || []);
+        renderEntrySection("experience", defaults.experience || []);
+        renderEntrySection("internships", defaults.internships || []);
+        renderEntrySection("projects", defaults.projects || []);
 
         ids.skillsLanguages.value = defaults.skills.languages || "";
         ids.skillsLibraries.value = defaults.skills.libraries || "";
@@ -214,10 +481,10 @@
             linkedin: ids.showLinkedin.checked,
             github: ids.showGithub.checked,
           },
-          academic_details: parseAcademic(ids.academic.value),
-          experience: parseEntries(ids.experience.value),
-          internships: parseEntries(ids.internships.value),
-          projects: parseEntries(ids.projects.value, true),
+          academic_details: collectEntrySection("academic"),
+          experience: collectEntrySection("experience"),
+          internships: collectEntrySection("internships"),
+          projects: collectEntrySection("projects"),
           skills: {
             languages: ids.skillsLanguages.value.trim(),
             libraries: ids.skillsLibraries.value.trim(),
@@ -273,6 +540,31 @@
           ids.error.textContent = err.message;
         });
       });
+
+      document.querySelectorAll("[data-add-entry]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const section = button.dataset.addEntry;
+          let container = null;
+          if (section === "experience") container = ids.experienceEntries;
+          else if (section === "internships") container = ids.internshipEntries;
+          else if (section === "projects") container = ids.projectEntries;
+          else if (section === "academic") container = ids.academicEntries;
+          if (!container) return;
+          container.append(createEntryCard(section, {}));
+          scheduleRender();
+        });
+      });
+
+      // Wire top render button to trigger the same render flow
+      if (ids.renderTop) {
+        ids.renderTop.addEventListener("click", (e) => {
+          e.preventDefault();
+          renderResume().catch((err) => {
+            ids.status.textContent = "Render failed";
+            ids.error.textContent = err.message;
+          });
+        });
+      }
 
       ids.form.addEventListener("input", scheduleRender);
       ids.form.addEventListener("change", scheduleRender);
