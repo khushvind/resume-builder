@@ -125,7 +125,7 @@ function createEntryCard(section, entry = {}) {
     const titleField = document.createElement("label");
     titleField.className = "entry-field";
     const titleSpan = document.createElement("span");
-    titleSpan.textContent = "Heading";
+    titleSpan.textContent = "Company";
     const titleInput = document.createElement("input");
     titleInput.type = "text";
     titleInput.className = "entry-input";
@@ -160,12 +160,12 @@ function createEntryCard(section, entry = {}) {
     const titleField = document.createElement("label");
     titleField.className = "entry-field";
     const titleSpan = document.createElement("span");
-    titleSpan.textContent = "Heading";
+    titleSpan.textContent = "Project Name";
     const titleInput = document.createElement("input");
     titleInput.type = "text";
     titleInput.className = "entry-input";
     titleInput.value = entry.title || "";
-    titleInput.placeholder = "Project title";
+    titleInput.placeholder = "Project name";
     titleField.append(titleSpan, titleInput);
 
     const subtitleField = document.createElement("label");
