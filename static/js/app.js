@@ -75,19 +75,6 @@ function createEntryCard(section, entry = {}) {
   const header = document.createElement("div");
   header.className = "entry-card-header";
 
-  const titleField = document.createElement("label");
-  titleField.className = "entry-field";
-  const titleSpan = document.createElement("span");
-  titleSpan.textContent = "Heading";
-  const titleInput = document.createElement("input");
-  titleInput.type = "text";
-  titleInput.className = "entry-input";
-  titleInput.value = entry.title || "";
-  titleInput.placeholder = "Company / Organization / Project";
-  titleField.append(titleSpan, titleInput);
-
-  header.append(titleField);
-
   if (section === "academic") {
     const yearField = document.createElement("label");
     yearField.className = "entry-field";
@@ -135,6 +122,17 @@ function createEntryCard(section, entry = {}) {
 
     header.append(yearField, degreeField, instField, marksField);
   } else if (section === "experience" || section === "internships") {
+    const titleField = document.createElement("label");
+    titleField.className = "entry-field";
+    const titleSpan = document.createElement("span");
+    titleSpan.textContent = "Heading";
+    const titleInput = document.createElement("input");
+    titleInput.type = "text";
+    titleInput.className = "entry-input";
+    titleInput.value = entry.title || "";
+    titleInput.placeholder = "Company / Organization";
+    titleField.append(titleSpan, titleInput);
+
     const roleField = document.createElement("label");
     roleField.className = "entry-field";
     const roleSpan = document.createElement("span");
@@ -157,8 +155,19 @@ function createEntryCard(section, entry = {}) {
     durationInput.placeholder = "(Jan 2025 - Present)";
     durationField.append(durationSpan, durationInput);
 
-    header.append(roleField, durationField);
+    header.append(titleField, roleField, durationField);
   } else {
+    const titleField = document.createElement("label");
+    titleField.className = "entry-field";
+    const titleSpan = document.createElement("span");
+    titleSpan.textContent = "Heading";
+    const titleInput = document.createElement("input");
+    titleInput.type = "text";
+    titleInput.className = "entry-input";
+    titleInput.value = entry.title || "";
+    titleInput.placeholder = "Project title";
+    titleField.append(titleSpan, titleInput);
+
     const subtitleField = document.createElement("label");
     subtitleField.className = "entry-field";
     const subtitleSpan = document.createElement("span");
@@ -192,7 +201,7 @@ function createEntryCard(section, entry = {}) {
     urlInput.placeholder = "https://...";
     urlField.append(urlSpan, urlInput);
 
-    header.append(subtitleField, durationField, urlField);
+    header.append(titleField, subtitleField, durationField, urlField);
   }
 
   let pointsBox = null;
