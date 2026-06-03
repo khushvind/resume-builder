@@ -80,37 +80,40 @@
 {{ row.year | latex_escape }} & {{ row.degree | latex_escape }} & {{ row.institute | latex_escape }} & {{ row.marks | latex_escape }} \\
 {% endfor %}
 \end{tabularx}
-{% endif %}
+{% endif -%}
 
 {% if data.show_sections.experience %}
 \section{\textbf{Experience}}
-{% for item in data.experience %}
-\textbf{ {{ item.title | latex_escape }} }: \textit{ {{ item.role | latex_escape }} }\hfill\textit{ {{ item.duration | latex_escape }} }\\
-{% for point in item.points %}
-- {{ point | latex_escape }}\\
-{% endfor %}
-{% endfor %}
-{% endif %}
+{%- for item in data.experience -%}
+\textbf{{ '{' }}{{ item.title | latex_escape }}{{ '}' }}: \textit{{ '{' }}{{ item.role | latex_escape }}{{ '}' }}\hfill\textit{{ '{' }}{{ item.duration | latex_escape }}{{ '}' }}\\
+{%- set is_last_item = loop.last -%}
+{%- for point in item.points -%}
+- {{ point | latex_escape }}{% if not loop.last or not is_last_item %}\\{% endif %}
+{%- endfor -%}
+{%- endfor -%}
+{%- endif -%}
 
 {% if data.show_sections.internships %}
 \section{\textbf{Internships}}
-{% for item in data.internships %}
-\textbf{ {{ item.title | latex_escape }} }: \textit{ {{ item.role | latex_escape }} }\hfill\textit{ {{ item.duration | latex_escape }} }\\
-{% for point in item.points %}
-- {{ point | latex_escape }}\\
-{% endfor %}
-{% endfor %}
-{% endif %}
+{%- for item in data.internships -%}
+\textbf{{ '{' }}{{ item.title | latex_escape }}{{ '}' }}: \textit{{ '{' }}{{ item.role | latex_escape }}{{ '}' }}\hfill\textit{{ '{' }}{{ item.duration | latex_escape }}{{ '}' }}\\
+{%- set is_last_item = loop.last -%}
+{%- for point in item.points -%}
+- {{ point | latex_escape }}{% if not loop.last or not is_last_item %}\\{% endif %}
+{%- endfor -%}
+{%- endfor -%}
+{%- endif -%}
 
 {% if data.show_sections.projects %}
 \section{\textbf{Key Projects}}
-{% for item in data.projects %}
-\textbf{ {{ item.title | latex_escape }} }{% if item.subtitle %} $\mid$ {{ item.subtitle | latex_escape }}{% endif %}\hfill\textit{ {{ item.duration | latex_escape }} } {% if item.url %}\href{ {{- item.url | latex_url -}} }{\raisebox{-0.05\height}{\faGithub}}{% endif %}\\
-{% for point in item.points %}
-- {{ point | latex_escape }}\\
-{% endfor %}
-{% endfor %}
-{% endif %}
+{%- for item in data.projects -%}
+\textbf{{ '{' }}{{ item.title | latex_escape }}{{ '}' }}{% if item.subtitle %} $\mid$ {{ item.subtitle | latex_escape }}{% endif %}\hfill\textit{{ '{' }}{{ item.duration | latex_escape }}{{ '}' }}{% if item.url %} \href{ {{- item.url | latex_url -}} }{\raisebox{-0.05\height}{\faGithub}}{% endif %}\\
+{%- set is_last_item = loop.last -%}
+{%- for point in item.points -%}
+- {{ point | latex_escape }}{% if not loop.last or not is_last_item %}\\{% endif %}
+{%- endfor -%}
+{%- endfor -%}
+{%- endif -%}
 
 {% if data.show_sections.skills %}
 \section{\textbf{Skills}}
