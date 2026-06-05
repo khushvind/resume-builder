@@ -29,9 +29,7 @@ function initIds() {
     experienceEntries: $("experience-entries"),
     internshipEntries: $("internships-entries"),
     projectEntries: $("project-entries"),
-    skillsLanguages: $("skills-languages"),
-    skillsLibraries: $("skills-libraries"),
-    skillsTools: $("skills-tools"),
+    skills: $("skills"),
     showAcademic: $("show-academic"),
     showExperience: $("show-experience"),
     showInternships: $("show-internships"),
@@ -327,9 +325,7 @@ function loadDefaults() {
   renderEntrySection("internships", defaults.internships || []);
   renderEntrySection("projects", defaults.projects || []);
 
-  ids.skillsLanguages.value = defaults.skills?.languages || "";
-  ids.skillsLibraries.value = defaults.skills?.libraries || "";
-  ids.skillsTools.value = defaults.skills?.tools || "";
+  ids.skills.value = defaults.skills || "";
 }
 
 function buildPayload() {
@@ -351,11 +347,7 @@ function buildPayload() {
     experience: collectEntrySection("experience"),
     internships: collectEntrySection("internships"),
     projects: collectEntrySection("projects"),
-    skills: {
-      languages: ids.skillsLanguages.value.trim(),
-      libraries: ids.skillsLibraries.value.trim(),
-      tools: ids.skillsTools.value.trim(),
-    },
+    skills: ids.skills.value.trim(),
     show_sections: {
       academic: ids.showAcademic.checked,
       experience: ids.showExperience.checked,

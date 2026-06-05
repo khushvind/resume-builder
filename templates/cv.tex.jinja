@@ -59,9 +59,9 @@
     \parbox{0.35\linewidth}{
         \raggedleft
         {% if data.show_contact.phone %}{{ data.phone | latex_escape }}\\{% endif %}
-        {% if data.show_contact.email %}\href{mailto:{{ data.email | latex_escape }}}{ {{ data.email | latex_escape }} }\\{% endif %}
-        {% if data.show_contact.linkedin %}\href{ {{- data.linkedin | latex_url -}} }{\faLinkedin\ {{ data.linkedin | latex_escape }}}\\{% endif %}
-        {% if data.show_contact.github %}\href{ {{- data.github | latex_url -}} }{\faGithub\ {{ data.github | latex_escape }}}{% endif %}
+        {% if data.show_contact.email %}\href{mailto:{{ data.email | latex_escape }}}{{ '{' }}{{ data.email | latex_escape }}{{ '}' }}\\{% endif %}
+        {% if data.show_contact.linkedin %}\href{ {{- data.linkedin | latex_url -}} }{\faLinkedin\ {{ data.linkedin | profile_username | latex_escape }}}\\{% endif %}
+        {% if data.show_contact.github %}\href{ {{- data.github | latex_url -}} }{\faGithub\ {{ data.github | profile_username | latex_escape }}}{% endif %}
     }
 }
 
@@ -117,7 +117,7 @@
 
 {% if data.show_sections.skills %}
 \section{\textbf{Skills}}
-\textbf{Programming Languages:} {{ data.skills.languages | latex_escape }} $\mid$ \textbf{Libraries:} {{ data.skills.libraries | latex_escape }} $\mid$ \textbf{Tools:} {{ data.skills.tools | latex_escape }}
+{{ data.skills | latex_escape }}
 {% endif %}
 
 \vfill

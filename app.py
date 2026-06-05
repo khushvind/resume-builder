@@ -9,6 +9,7 @@ import uuid
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlparse
 
 from flask import Flask, jsonify, render_template, request, send_file
 
@@ -80,11 +81,7 @@ DEFAULT_DATA: dict[str, Any] = {
             ],
         }
     ],
-    "skills": {
-        "languages": "Python, C/C++, Java",
-        "libraries": "NumPy, Pandas, PyTorch",
-        "tools": "Git, Linux, Docker, LaTeX",
-    },
+    "skills": "Python, C/C++, Java, NumPy, Pandas, PyTorch, Git, Linux, Docker, LaTeX",
     "show_contact": {
         "phone": True,
         "email": True,
@@ -142,6 +139,32 @@ def latex_url(value: str) -> str:
     return text
 
 
+def profile_username(value: str) -> str:
+    if value is None:
+        return ""
+
+    text = str(value).strip().strip("/")
+    if not text:
+        return ""
+
+    parsed = urlparse(text if re.match(r"^[a-zA-Z][a-zA-Z0-9+.-]*://", text) else f"https://{text}")
+    segments = [segment for segment in parsed.path.split("/") if segment]
+    host = parsed.netloc.lower()
+
+    if "linkedin.com" in host and "in" in segments:
+        in_index = segments.index("in")
+        if in_index + 1 < len(segments):
+            return segments[in_index + 1].lstrip("@")
+
+    if "github.com" in host and segments:
+        return segments[0].lstrip("@")
+
+    if segments:
+        return segments[-1].lstrip("@")
+
+    return text.rsplit("/", 1)[-1].lstrip("@")
+
+
 def sanitize_payload(payload: dict[str, Any]) -> dict[str, Any]:
     data = {
         "name": payload.get("name") or DEFAULT_DATA["name"],
@@ -155,17 +178,12 @@ def sanitize_payload(payload: dict[str, Any]) -> dict[str, Any]:
         "experience": payload.get("experience") or [],
         "internships": payload.get("internships") or [],
         "projects": payload.get("projects") or [],
-        "skills": payload.get("skills") or {},
+        "skills": payload.get("skills") or DEFAULT_DATA["skills"],
         "show_contact": payload.get("show_contact") or {},
         "show_sections": payload.get("show_sections") or {},
     }
 
-    skills = data["skills"]
-    data["skills"] = {
-        "languages": skills.get("languages", ""),
-        "libraries": skills.get("libraries", ""),
-        "tools": skills.get("tools", ""),
-    }
+    data["skills"] = str(data["skills"])
 
     merged_sections = dict(DEFAULT_DATA["show_sections"])
     merged_sections.update({k: bool(v) for k, v in data["show_sections"].items()})
@@ -268,6 +286,7 @@ def create_app() -> Flask:
     app = Flask(__name__, template_folder=str(BASE_DIR / "templates"), static_folder=str(BASE_DIR / "static"))
     app.jinja_env.filters["latex_escape"] = latex_escape
     app.jinja_env.filters["latex_url"] = latex_url
+    app.jinja_env.filters["profile_username"] = profile_username
 
     @app.get("/")
     def index() -> str:
