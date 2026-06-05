@@ -50,8 +50,8 @@ function createPointRow(value = "") {
   const row = document.createElement("div");
   row.className = "point-row";
 
-  const input = document.createElement("input");
-  input.type = "text";
+  const input = document.createElement("textarea");
+  input.rows = 2;
   input.className = "point-input";
   input.value = value;
   input.placeholder = "Point";

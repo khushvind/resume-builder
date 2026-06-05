@@ -231,6 +231,17 @@ h2 {
   width: 100%;
 }
 
+.point-input,
+#skills {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+textarea.point-input {
+  min-height: 42px;
+  resize: vertical;
+}
+
 .points-box {
   margin-top: 12px;
   border-top: 1px dashed var(--line);
@@ -265,7 +276,7 @@ h2 {
   display: grid;
   grid-template-columns: 1fr auto;
   gap: 8px;
-  align-items: center;
+  align-items: start;
 }
 
 .row-remove,
