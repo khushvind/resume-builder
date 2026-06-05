@@ -27,8 +27,8 @@ class CompileResult:
 
 DEFAULT_DATA: dict[str, Any] = {
     "name": "Your Name",
-    "course": "Bachelor of Technology",
-    "branch": "Mathematics and Computing",
+    "course": "Degree",
+    "branch": "Major",
     "phone": "+91-0000000000",
     "email": "you@example.com",
     "linkedin": "https://linkedin.com/in/your-profile",
@@ -36,7 +36,7 @@ DEFAULT_DATA: dict[str, Any] = {
     "academic_details": [
         {
             "year": "2021-25",
-            "degree": "B.Tech Mathematics and Computing",
+            "degree": "B.Tech Computer Science",
             "institute": "Your Institute",
             "marks": "8.00/10.0",
         },
