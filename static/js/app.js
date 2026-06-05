@@ -36,6 +36,8 @@ function initIds() {
     showProjects: $("show-projects"),
     showSkills: $("show-skills"),
     form: $("resume-form"),
+    appShell: document.querySelector(".app-shell"),
+    panelResizer: $("panel-resizer"),
     frame: $("pdf-frame"),
     status: $("status"),
     error: $("error-box"),
@@ -359,6 +361,66 @@ function buildPayload() {
 }
 
 let debounceHandle;
+const resizeState = {
+  minFormWidth: 320,
+  minPreviewWidth: 360,
+};
+
+function clampFormWidth(width) {
+  const shellRect = ids.appShell.getBoundingClientRect();
+  const styles = getComputedStyle(ids.appShell);
+  const columnGap = parseFloat(styles.columnGap) || 0;
+  const paddingX = (parseFloat(styles.paddingLeft) || 0) + (parseFloat(styles.paddingRight) || 0);
+  const resizerWidth = ids.panelResizer?.offsetWidth || 0;
+  const availableWidth = shellRect.width - paddingX - resizerWidth - columnGap * 2;
+  const maxFormWidth = Math.max(resizeState.minFormWidth, availableWidth - resizeState.minPreviewWidth);
+  return Math.min(Math.max(width, resizeState.minFormWidth), maxFormWidth);
+}
+
+function setFormPanelWidth(width) {
+  ids.appShell.style.setProperty("--form-panel-width", `${clampFormWidth(width)}px`);
+}
+
+function initPanelResizer() {
+  if (!ids.appShell || !ids.panelResizer) return;
+
+  ids.panelResizer.addEventListener("pointerdown", (event) => {
+    if (window.matchMedia("(max-width: 980px)").matches) return;
+    event.preventDefault();
+    ids.panelResizer.setPointerCapture(event.pointerId);
+    ids.appShell.classList.add("is-resizing");
+  });
+
+  ids.panelResizer.addEventListener("pointermove", (event) => {
+    if (!ids.appShell.classList.contains("is-resizing")) return;
+    const shellRect = ids.appShell.getBoundingClientRect();
+    const styles = getComputedStyle(ids.appShell);
+    const paddingLeft = parseFloat(styles.paddingLeft) || 0;
+    setFormPanelWidth(event.clientX - shellRect.left - paddingLeft);
+  });
+
+  const endResize = (event) => {
+    ids.appShell.classList.remove("is-resizing");
+    if (ids.panelResizer.hasPointerCapture(event.pointerId)) {
+      ids.panelResizer.releasePointerCapture(event.pointerId);
+    }
+  };
+
+  ids.panelResizer.addEventListener("pointerup", endResize);
+  ids.panelResizer.addEventListener("pointercancel", endResize);
+
+  ids.panelResizer.addEventListener("keydown", (event) => {
+    if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+    event.preventDefault();
+
+    const currentWidth = ids.form.closest(".form-panel").getBoundingClientRect().width;
+    if (event.key === "ArrowLeft") setFormPanelWidth(currentWidth - 24);
+    if (event.key === "ArrowRight") setFormPanelWidth(currentWidth + 24);
+    if (event.key === "Home") setFormPanelWidth(resizeState.minFormWidth);
+    if (event.key === "End") setFormPanelWidth(Number.MAX_SAFE_INTEGER);
+  });
+}
+
 async function renderResume() {
   ids.status.textContent = "Rendering...";
   ids.error.textContent = "";
@@ -430,6 +492,7 @@ function wireEvents() {
 
 document.addEventListener("DOMContentLoaded", () => {
   initIds();
+  initPanelResizer();
   wireEvents();
   loadDefaults();
   scheduleRender();
