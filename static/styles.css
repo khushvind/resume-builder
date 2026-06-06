@@ -1,11 +1,16 @@
 :root {
-  --bg: #f3f7fa;
+  --bg: #eef2f5;
+  --surface: #f8fafc;
   --panel: #ffffff;
-  --ink: #11263a;
-  --muted: #536579;
-  --line: #d7e1ea;
-  --brand: #0b6bcb;
-  --brand-dark: #084f97;
+  --ink: #17212f;
+  --muted: #647184;
+  --line: #d8e0e8;
+  --line-strong: #c1ccd8;
+  --brand: #1f6feb;
+  --brand-dark: #1557bd;
+  --success: #237a57;
+  --danger: #9f2d2d;
+  --shadow: 0 18px 45px rgba(23, 33, 47, 0.08);
 }
 
 * {
@@ -14,12 +19,9 @@
 
 body {
   margin: 0;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-family: Inter, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   color: var(--ink);
-  background:
-    radial-gradient(circle at 10% 10%, #d6e9ff 0%, transparent 24%),
-    radial-gradient(circle at 90% 85%, #d7f6e7 0%, transparent 20%),
-    var(--bg);
+  background: var(--bg);
 }
 
 html, body {
@@ -30,9 +32,9 @@ html, body {
 .app-shell {
   display: grid;
   grid-template-columns: minmax(320px, var(--form-panel-width, 1fr)) 12px minmax(360px, 1fr);
-  gap: 10px;
+  gap: 12px;
   height: 100vh;
-  padding: 18px;
+  padding: 16px;
 }
 
 .panel-resizer {
@@ -111,37 +113,49 @@ html, body {
 .panel {
   background: var(--panel);
   border: 1px solid var(--line);
-  border-radius: 14px;
-  box-shadow: 0 10px 35px rgba(17, 38, 58, 0.08);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
 }
 
 .form-panel {
-  padding: 20px;
+  padding: 22px;
   overflow-y: auto;
+  scrollbar-gutter: stable;
 }
 
 .form-panel h1 {
-  margin: 0 0 8px;
+  margin: 0 0 4px;
+  font-size: 1.35rem;
+  line-height: 1.2;
+  letter-spacing: 0;
 }
 
 .form-panel p {
-  margin-top: 0;
+  margin: 0 0 18px;
   color: var(--muted);
+  font-size: 0.9rem;
 }
 
 label {
   display: grid;
   gap: 6px;
-  margin: 8px 0;
-  font-size: 0.92rem;
+  margin: 10px 0;
+  font-size: 0.86rem;
+  font-weight: 650;
+  color: #2d3a49;
 }
 
 input,
 textarea {
   border: 1px solid var(--line);
-  border-radius: 10px;
-  padding: 10px;
+  border-radius: 7px;
+  padding: 9px 10px;
   font-size: 0.94rem;
+  font: inherit;
+  font-weight: 400;
+  color: var(--ink);
+  background: var(--surface);
+  transition: border-color 120ms ease, box-shadow 120ms ease, background 120ms ease;
 }
 
 textarea {
@@ -150,10 +164,28 @@ textarea {
   line-height: 1.4;
 }
 
+input:focus,
+textarea:focus {
+  border-color: var(--brand);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(31, 111, 235, 0.12);
+  outline: 0;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #8a97a6;
+}
+
+input[type="checkbox"] {
+  accent-color: var(--brand);
+}
+
 h2 {
-  margin-top: 18px;
-  margin-bottom: 6px;
-  font-size: 1rem;
+  margin-top: 20px;
+  margin-bottom: 8px;
+  font-size: 0.98rem;
+  letter-spacing: 0;
 }
 
 .hint {
@@ -163,7 +195,9 @@ h2 {
 }
 
 .section-heading {
-  margin: 18px 0 6px;
+  margin: 22px 0 8px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -176,6 +210,7 @@ h2 {
   gap: 10px;
   font: inherit;
   font-weight: 600;
+  color: var(--ink);
   cursor: pointer;
 }
 
@@ -197,16 +232,16 @@ h2 {
 
 .entry-list {
   display: grid;
-  gap: 12px;
+  gap: 10px;
   margin-top: 10px;
 }
 
 .entry-card {
   border: 1px solid var(--line);
-  border-radius: 14px;
-  background: #fdfefe;
+  border-radius: 8px;
+  background: #fff;
   padding: 12px;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  box-shadow: 0 1px 2px rgba(23, 33, 47, 0.04);
 }
 
 .entry-card-header {
@@ -244,7 +279,7 @@ textarea.point-input {
 
 .points-box {
   margin-top: 12px;
-  border-top: 1px dashed var(--line);
+  border-top: 1px dashed var(--line-strong);
   padding-top: 10px;
 }
 
@@ -283,7 +318,7 @@ textarea.point-input {
 .entry-remove {
   border: 1px solid var(--line);
   background: #fff;
-  color: var(--ink);
+  color: var(--muted);
 }
 
 .row-remove {
@@ -293,6 +328,13 @@ textarea.point-input {
   padding: 0;
   font-size: 1.05rem;
   line-height: 1;
+}
+
+.row-remove:hover,
+.entry-remove:hover {
+  border-color: #e2b8b8;
+  background: #fff5f5;
+  color: var(--danger);
 }
 
 .entry-actions {
@@ -308,7 +350,11 @@ textarea.point-input {
 
 .contact-grid {
   display: grid;
-  gap: 10px;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfdff;
 }
 
 .contact-field {
@@ -319,7 +365,7 @@ textarea.point-input {
 
 .contact-field span {
   grid-column: 1 / -1;
-  font-size: 0.88rem;
+  font-size: 0.82rem;
   color: var(--muted);
 }
 
@@ -343,10 +389,10 @@ textarea.point-input {
 button,
 .button {
   border: 0;
-  border-radius: 10px;
+  border-radius: 7px;
   background: var(--brand);
   color: #fff;
-  padding: 10px 14px;
+  padding: 9px 13px;
   font-weight: 600;
   text-decoration: none;
   cursor: pointer;
@@ -355,6 +401,8 @@ button,
   justify-content: center;
   gap: 8px;
   line-height: 1;
+  box-shadow: 0 1px 2px rgba(23, 33, 47, 0.1);
+  transition: background 120ms ease, box-shadow 120ms ease, transform 120ms ease;
 }
 /* Normalize font metrics so <button> and <a class="button"> match exactly */
 .button,
@@ -387,21 +435,27 @@ button {
 button:hover,
 .button:hover {
   background: var(--brand-dark);
+  box-shadow: 0 8px 20px rgba(31, 111, 235, 0.18);
 }
 
 .button.secondary {
-  background: #1f7d4d;
+  background: var(--success);
+}
+
+button:active,
+.button:active {
+  transform: translateY(1px);
 }
 
 .error {
   margin-top: 10px;
   white-space: pre-wrap;
-  color: #9c1f1f;
+  color: var(--danger);
   font-size: 0.86rem;
 }
 
 .preview-panel {
-  padding: 14px;
+  padding: 12px;
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -412,7 +466,10 @@ button:hover,
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 0 6px 10px;
+  gap: 12px;
+  margin: 0 2px 10px;
+  padding: 2px 2px 10px;
+  border-bottom: 1px solid var(--line);
 }
 
 .preview-header h2 {
@@ -422,6 +479,7 @@ button:hover,
 #status {
   color: var(--muted);
   font-size: 0.85rem;
+  white-space: nowrap;
 }
 
 .preview-actions {
@@ -433,7 +491,7 @@ button:hover,
 .preview-actions .button {
   padding: 6px 10px;
   font-size: 0.88rem;
-  border-radius: 8px;
+  border-radius: 7px;
 }
 
 .preview-actions .button.secondary {
@@ -444,17 +502,25 @@ button:hover,
   width: 100%;
   flex: 1 1 auto;
   border: 1px solid var(--line);
-  border-radius: 10px;
-  background: #f2f2f2;
+  border-radius: 8px;
+  background: #f5f7fa;
+  box-shadow: inset 0 1px 3px rgba(23, 33, 47, 0.06);
 }
 
 @media (max-width: 980px) {
   .app-shell {
     grid-template-columns: 1fr;
+    height: auto;
+    min-height: 100vh;
+    overflow: auto;
   }
 
   .panel-resizer {
     display: none;
+  }
+
+  html, body {
+    overflow: auto;
   }
 
   #pdf-frame {
