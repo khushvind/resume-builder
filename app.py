@@ -81,6 +81,14 @@ DEFAULT_DATA: dict[str, Any] = {
             ],
         }
     ],
+    "scholastic_achievements": [
+        {"title": "JEE Advanced 2021", "details": "Secured an All India Rank of 302 among the selected pool of students."},
+        {"title": "KVPY Fellowship 2020", "details": "Conferred by IISc and DST, Government of India."},
+    ],
+    "organizations": [
+        {"title": "Mathematics Society, IIT Delhi", "details": "Coordinator (June 2023 - May 2024) - Responsible for coordinating various society events."},
+    ],
+    "courses": "Introduction To Computer Science, Data Structures & Algorithms, Analysis & Design of Algorithms, Computer Architecture, Operating Systems",
     "skills": "Python, C/C++, Java, NumPy, Pandas, PyTorch, Git, Linux, Docker, LaTeX",
     "show_contact": {
         "phone": True,
@@ -94,6 +102,9 @@ DEFAULT_DATA: dict[str, Any] = {
         "internships": True,
         "projects": True,
         "skills": True,
+        "scholastic": True,
+        "organizations": True,
+        "courses": True,
     },
 }
 
@@ -115,16 +126,16 @@ def latex_escape(value: str) -> str:
         return ""
 
     substitutions = {
-        "\\": r"\\textbackslash{}",
-        "&": r"\\&",
-        "%": r"\\%",
-        "$": r"\\$",
-        "#": r"\\#",
-        "_": r"\\_",
-        "{": r"\\{",
-        "}": r"\\}",
-        "~": r"\\textasciitilde{}",
-        "^": r"\\textasciicircum{}",
+        "\\": r"\textbackslash{}",
+        "&": r"\&",
+        "%": r"\%",
+        "$": r"\$",
+        "#": r"\#",
+        "_": r"\_",
+        "{": r"\{",
+        "}": r"\}",
+        "~": r"\textasciitilde{}",
+        "^": r"\textasciicircum{}",
     }
     pattern = re.compile("|".join(re.escape(key) for key in substitutions))
     return pattern.sub(lambda m: substitutions[m.group()], str(value))
@@ -175,9 +186,12 @@ def sanitize_payload(payload: dict[str, Any]) -> dict[str, Any]:
         "linkedin": payload.get("linkedin") or DEFAULT_DATA["linkedin"],
         "github": payload.get("github") or DEFAULT_DATA["github"],
         "academic_details": payload.get("academic_details") or [],
-        "experience": payload.get("experience") or [],
-        "internships": payload.get("internships") or [],
-        "projects": payload.get("projects") or [],
+        "experience": payload.get("experience") or DEFAULT_DATA.get("experience", []),
+        "internships": payload.get("internships") or DEFAULT_DATA.get("internships", []),
+        "projects": payload.get("projects") or DEFAULT_DATA.get("projects", []),
+        "scholastic_achievements": payload.get("scholastic_achievements") or DEFAULT_DATA.get("scholastic_achievements", []),
+        "organizations": payload.get("organizations") or DEFAULT_DATA.get("organizations", []),
+        "courses": payload.get("courses") or DEFAULT_DATA["courses"],
         "skills": payload.get("skills") or DEFAULT_DATA["skills"],
         "show_contact": payload.get("show_contact") or {},
         "show_sections": payload.get("show_sections") or {},
@@ -193,7 +207,7 @@ def sanitize_payload(payload: dict[str, Any]) -> dict[str, Any]:
     merged_contact.update({k: bool(v) for k, v in data["show_contact"].items()})
     data["show_contact"] = merged_contact
 
-    for key in ["academic_details", "experience", "internships", "projects"]:
+    for key in ["academic_details", "experience", "internships", "projects", "scholastic_achievements", "organizations"]:
         if not isinstance(data[key], list):
             data[key] = []
 
@@ -207,6 +221,18 @@ def sanitize_payload(payload: dict[str, Any]) -> dict[str, Any]:
         for row in data["academic_details"]
         if isinstance(row, dict)
     ]
+
+    for key in ["scholastic_achievements", "organizations"]:
+        if not isinstance(data[key], list):
+            data[key] = []
+        data[key] = [
+            {
+                "title": str(row.get("title", "")),
+                "details": str(row.get("details", "")),
+            }
+            for row in data[key]
+            if isinstance(row, dict)
+        ]
 
     for key in ["experience", "internships"]:
         clean_rows = []

@@ -81,6 +81,32 @@
 
           <h2 class="section-heading">
             <label class="section-toggle">
+              <span>Scholastic Achievements</span>
+              <input type="checkbox" id="show-scholastic" checked />
+            </label>
+            <button type="button" class="section-add" data-add-entry="scholastic" aria-label="Add achievement">+</button>
+          </h2>
+          <div id="scholastic-entries" class="entry-list" data-section="scholastic"></div>
+
+          <h2 class="section-heading">
+            <label class="section-toggle">
+              <span>Courses</span>
+              <input type="checkbox" id="show-courses" checked />
+            </label>
+          </h2>
+          <label>Courses <textarea id="courses" placeholder="Data Structures, Algorithms, Operating Systems..."></textarea></label>
+
+          <h2 class="section-heading">
+            <label class="section-toggle">
+              <span>Organizations/Extracurriculars</span>
+              <input type="checkbox" id="show-organizations" checked />
+            </label>
+            <button type="button" class="section-add" data-add-entry="organizations" aria-label="Add organization">+</button>
+          </h2>
+          <div id="organizations-entries" class="entry-list" data-section="organizations"></div>
+
+          <h2 class="section-heading">
+            <label class="section-toggle">
               <span>Skills</span>
               <input type="checkbox" id="show-skills" checked />
             </label>

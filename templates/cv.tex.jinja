@@ -120,6 +120,25 @@
 {{ data.skills | latex_escape }}
 {% endif %}
 
+{% if data.show_sections.scholastic %}
+\section{\textbf{Scholastic Achievements}}
+{%- for item in data.scholastic_achievements -%}
+- \textbf{{ '{' }}{{ item.title | latex_escape }}:{{ '}' }} {{ item.details | latex_escape }}{% if not loop.last %}\\{% endif %}
+{% endfor -%}
+{% endif %}
+
+{% if data.show_sections.courses %}
+\section{\textbf{Courses}}
+{{ data.courses | latex_escape }}
+{% endif %}
+
+{% if data.show_sections.organizations %}
+\section{\textbf{Organizations/Extracurriculars}}
+{%- for item in data.organizations -%}
+- \textbf{{ '{' }}{{ item.title | latex_escape }}:{{ '}' }} {{ item.details | latex_escape }}{% if not loop.last %}\\{% endif %}
+{% endfor -%}
+{% endif %}
+
 \vfill
 
 \end{document}

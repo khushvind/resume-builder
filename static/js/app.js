@@ -29,12 +29,18 @@ function initIds() {
     experienceEntries: $("experience-entries"),
     internshipEntries: $("internships-entries"),
     projectEntries: $("project-entries"),
+    scholasticEntries: $("scholastic-entries"),
+    organizationsEntries: $("organizations-entries"),
     skills: $("skills"),
+    courses: $("courses"),
     showAcademic: $("show-academic"),
     showExperience: $("show-experience"),
     showInternships: $("show-internships"),
     showProjects: $("show-projects"),
     showSkills: $("show-skills"),
+    showScholastic: $("show-scholastic"),
+    showOrganizations: $("show-organizations"),
+    showCourses: $("show-courses"),
     form: $("resume-form"),
     appShell: document.querySelector(".app-shell"),
     panelResizer: $("panel-resizer"),
@@ -157,6 +163,31 @@ function createEntryCard(section, entry = {}) {
 
     header.append(titleField, roleField, durationField);
   } else {
+    if (section === "scholastic" || section === "organizations") {
+      const titleField = document.createElement("label");
+      titleField.className = "entry-field";
+      const titleSpan = document.createElement("span");
+      titleSpan.textContent = "Title";
+      const titleInput = document.createElement("input");
+      titleInput.type = "text";
+      titleInput.className = "entry-input";
+      titleInput.value = entry.title || "";
+      titleInput.placeholder = "e.g. JEE Advanced 2021";
+      titleField.append(titleSpan, titleInput);
+
+      const detailField = document.createElement("label");
+      detailField.className = "entry-field";
+      const detailSpan = document.createElement("span");
+      detailSpan.textContent = "Details";
+      const detailInput = document.createElement("input");
+      detailInput.type = "text";
+      detailInput.className = "entry-input";
+      detailInput.value = entry.details || "";
+      detailInput.placeholder = "Achievement / Role details";
+      detailField.append(detailSpan, detailInput);
+
+      header.append(titleField, detailField);
+    } else {
     const titleField = document.createElement("label");
     titleField.className = "entry-field";
     const titleSpan = document.createElement("span");
@@ -202,10 +233,11 @@ function createEntryCard(section, entry = {}) {
     urlField.append(urlSpan, urlInput);
 
     header.append(titleField, subtitleField, durationField, urlField);
+    }
   }
 
   let pointsBox = null;
-  if (section !== "academic") {
+  if (section !== "academic" && section !== "scholastic" && section !== "organizations") {
     pointsBox = document.createElement("div");
     pointsBox.className = "points-box";
 
@@ -253,6 +285,8 @@ function renderEntrySection(section, rows) {
   else if (section === "internships") container = ids.internshipEntries;
   else if (section === "projects") container = ids.projectEntries;
   else if (section === "academic") container = ids.academicEntries;
+  else if (section === "scholastic") container = ids.scholasticEntries;
+  else if (section === "organizations") container = ids.organizationsEntries;
   if (!container) return;
   container.innerHTML = "";
   const list = rows && rows.length ? rows : [{}];
@@ -265,6 +299,8 @@ function collectEntrySection(section) {
   else if (section === "internships") container = ids.internshipEntries;
   else if (section === "projects") container = ids.projectEntries;
   else if (section === "academic") container = ids.academicEntries;
+  else if (section === "scholastic") container = ids.scholasticEntries;
+  else if (section === "organizations") container = ids.organizationsEntries;
   if (!container) return [];
 
   return [...container.querySelectorAll(`.entry-card[data-section="${section}"]`)].map((card) => {
@@ -288,6 +324,14 @@ function collectEntrySection(section) {
         role: roleInput?.value.trim() || "",
         duration: durationInput?.value.trim() || "",
         points,
+      };
+    }
+
+    if (section === "scholastic" || section === "organizations") {
+      const [titleInput, detailInput] = inputs;
+      return {
+        title: titleInput?.value.trim() || "",
+        details: detailInput?.value.trim() || "",
       };
     }
 
@@ -316,18 +360,24 @@ function loadDefaults() {
   ids.showLinkedin.checked = defaults.show_contact?.linkedin ?? true;
   ids.showGithub.checked = defaults.show_contact?.github ?? true;
 
-  ids.showAcademic.checked = defaults.show_sections?.academic ?? true;
-  ids.showExperience.checked = defaults.show_sections?.experience ?? true;
-  ids.showInternships.checked = defaults.show_sections?.internships ?? true;
-  ids.showProjects.checked = defaults.show_sections?.projects ?? true;
-  ids.showSkills.checked = defaults.show_sections?.skills ?? true;
+  if (ids.showAcademic) ids.showAcademic.checked = defaults.show_sections?.academic ?? true;
+  if (ids.showExperience) ids.showExperience.checked = defaults.show_sections?.experience ?? true;
+  if (ids.showInternships) ids.showInternships.checked = defaults.show_sections?.internships ?? true;
+  if (ids.showProjects) ids.showProjects.checked = defaults.show_sections?.projects ?? true;
+  if (ids.showSkills) ids.showSkills.checked = defaults.show_sections?.skills ?? true;
+  if (ids.showScholastic) ids.showScholastic.checked = defaults.show_sections?.scholastic ?? true;
+  if (ids.showOrganizations) ids.showOrganizations.checked = defaults.show_sections?.organizations ?? true;
+  if (ids.showCourses) ids.showCourses.checked = defaults.show_sections?.courses ?? true;
 
   renderEntrySection("academic", defaults.academic_details || []);
   renderEntrySection("experience", defaults.experience || []);
   renderEntrySection("internships", defaults.internships || []);
   renderEntrySection("projects", defaults.projects || []);
+  renderEntrySection("scholastic", defaults.scholastic_achievements || []);
+  renderEntrySection("organizations", defaults.organizations || []);
 
-  ids.skills.value = defaults.skills || "";
+  if (ids.skills) ids.skills.value = defaults.skills || "";
+  if (ids.courses) ids.courses.value = defaults.courses || "";
 }
 
 function buildPayload() {
@@ -340,22 +390,28 @@ function buildPayload() {
     linkedin: ids.linkedin.value.trim(),
     github: ids.github.value.trim(),
     show_contact: {
-      phone: ids.showPhone.checked,
-      email: ids.showEmail.checked,
-      linkedin: ids.showLinkedin.checked,
-      github: ids.showGithub.checked,
+      phone: ids.showPhone?.checked ?? true,
+      email: ids.showEmail?.checked ?? true,
+      linkedin: ids.showLinkedin?.checked ?? true,
+      github: ids.showGithub?.checked ?? true,
     },
     academic_details: collectEntrySection("academic"),
     experience: collectEntrySection("experience"),
     internships: collectEntrySection("internships"),
     projects: collectEntrySection("projects"),
-    skills: ids.skills.value.trim(),
+    scholastic_achievements: collectEntrySection("scholastic"),
+    organizations: collectEntrySection("organizations"),
+    skills: ids.skills?.value.trim() || "",
+    courses: ids.courses?.value.trim() || "",
     show_sections: {
-      academic: ids.showAcademic.checked,
-      experience: ids.showExperience.checked,
-      internships: ids.showInternships.checked,
-      projects: ids.showProjects.checked,
-      skills: ids.showSkills.checked,
+      academic: ids.showAcademic?.checked ?? true,
+      experience: ids.showExperience?.checked ?? true,
+      internships: ids.showInternships?.checked ?? true,
+      projects: ids.showProjects?.checked ?? true,
+      skills: ids.showSkills?.checked ?? true,
+      scholastic: ids.showScholastic?.checked ?? true,
+      organizations: ids.showOrganizations?.checked ?? true,
+      courses: ids.showCourses?.checked ?? true,
     },
   };
 }
@@ -470,6 +526,8 @@ function wireEvents() {
       else if (section === "internships") container = ids.internshipEntries;
       else if (section === "projects") container = ids.projectEntries;
       else if (section === "academic") container = ids.academicEntries;
+      else if (section === "scholastic") container = ids.scholasticEntries;
+      else if (section === "organizations") container = ids.organizationsEntries;
       if (!container) return;
       container.append(createEntryCard(section, {}));
       scheduleRender();
