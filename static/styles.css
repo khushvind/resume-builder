@@ -348,13 +348,22 @@ textarea.point-input {
   font-size: 0.82rem;
 }
 
-.contact-grid {
+.header-details-group {
   display: grid;
-  gap: 8px;
-  padding: 12px;
+  gap: 12px;
+  padding: 16px;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: #fbfdff;
+  margin-bottom: 20px;
+}
+
+.contact-grid {
+  display: grid;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--line-strong);
+  background: transparent;
 }
 
 .contact-field {
