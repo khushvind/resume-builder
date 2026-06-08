@@ -60,8 +60,8 @@
         \raggedleft
         {% if data.show_contact.phone %}{{ data.phone | latex_escape }}\\{% endif %}
         {% if data.show_contact.email %}\href{mailto:{{ data.email | latex_escape }}}{{ '{' }}{{ data.email | latex_escape }}{{ '}' }}\\{% endif %}
-        {% if data.show_contact.linkedin %}\href{ {{- data.linkedin | latex_url -}} }{\faLinkedin\ {{ data.linkedin | profile_username | latex_escape }}}\\{% endif %}
-        {% if data.show_contact.github %}\href{ {{- data.github | latex_url -}} }{\faGithub\ {{ data.github | profile_username | latex_escape }}}{% endif %}
+        {% if data.show_contact.linkedin %}\href{ {{- data.linkedin | latex_url -}} }{{ '{' }}\faLinkedin\ {{ data.linkedin | profile_username | latex_escape }}{{ '}' }}\\{% endif %}
+        {% if data.show_contact.github %}\href{ {{- data.github | latex_url -}} }{{ '{' }}\faGithub\ {{ data.github | profile_username | latex_escape }}{{ '}' }}{% endif %}
     }
 }
 
@@ -97,7 +97,7 @@
   {% elif section_id == 'projects' and data.show_sections.projects %}
     \section{\textbf{Key Projects}}
     {%- for item in data.projects -%}
-    \textbf{{ '{' }}{{ item.title | latex_escape }}{{ '}' }}{% if item.subtitle %} $\mid$ {{ item.subtitle | latex_escape }}{% endif %}\hfill\textit{{ '{' }}{{ item.duration | latex_escape }}{{ '}' }}{% if item.url %} \href{ {{- item.url | latex_url -}} }{\raisebox{-0.05\height}{\faGithub}}{% endif %}\\
+    \textbf{{ '{' }}{{ item.title | latex_escape }}{{ '}' }}{% if item.subtitle %} $\mid$ {{ item.subtitle | latex_escape }}{% endif %}\hfill\textit{{ '{' }}{{ item.duration | latex_escape }}{{ '}' }}{% if item.url %} \href{ {{- item.url | latex_url -}} }{{ '{' }}\raisebox{-0.05\height}{\faGithub}{{ '}' }}{% endif %}\\
     {%- set is_last_item = loop.last -%}
     {%- for point in item.points -%}
     - {{ point | latex_escape }}{% if not loop.last or not is_last_item %}\\{% endif %}
