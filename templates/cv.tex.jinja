@@ -65,79 +65,62 @@
     }
 }
 
-%----------------------------------------------------------------------------------------
-% EXPERIENCE SECTIONS
-%----------------------------------------------------------------------------------------
-
-{% if data.show_sections.academic %}
-\section{\textbf{Academic Details}}
-\setlength{\tabcolsep}{13pt}
-
-\begin{tabularx}{\linewidth}{l  X  X  r}
-\centering
-\textbf{Year} & \textbf{Degree/Course} & \textbf{Institute} & \textbf{GPA/Marks(\%)} \\
-{% for row in data.academic_details %}
-{{ row.year | latex_escape }} & {{ row.degree | latex_escape }} & {{ row.institute | latex_escape }} & {{ row.marks | latex_escape }} \\
+{% for section_id in data.section_order %}
+  {% if section_id == 'academic' and data.show_sections.academic %}
+    \section{\textbf{Academic Details}}
+    \setlength{\tabcolsep}{13pt}
+    \begin{tabularx}{\linewidth}{l  X  X  r}
+    \centering
+    \textbf{Year} & \textbf{Degree/Course} & \textbf{Institute} & \textbf{GPA/Marks(\%)} \\
+    {% for row in data.academic_details %}
+    {{ row.year | latex_escape }} & {{ row.degree | latex_escape }} & {{ row.institute | latex_escape }} & {{ row.marks | latex_escape }} \\
+    {% endfor %}
+    \end{tabularx}
+  {% elif section_id == 'experience' and data.show_sections.experience %}
+    \section{\textbf{Experience}}
+    {%- for item in data.experience -%}
+    \textbf{{ '{' }}{{ item.title | latex_escape }}{{ '}' }}: \textit{{ '{' }}{{ item.role | latex_escape }}{{ '}' }}\hfill\textit{{ '{' }}{{ item.duration | latex_escape }}{{ '}' }}\\
+    {%- set is_last_item = loop.last -%}
+    {%- for point in item.points -%}
+    - {{ point | latex_escape }}{% if not loop.last or not is_last_item %}\\{% endif %}
+    {%- endfor -%}
+    {%- endfor -%}
+  {% elif section_id == 'internships' and data.show_sections.internships %}
+    \section{\textbf{Internships}}
+    {%- for item in data.internships -%}
+    \textbf{{ '{' }}{{ item.title | latex_escape }}{{ '}' }}: \textit{{ '{' }}{{ item.role | latex_escape }}{{ '}' }}\hfill\textit{{ '{' }}{{ item.duration | latex_escape }}{{ '}' }}\\
+    {%- set is_last_item = loop.last -%}
+    {%- for point in item.points -%}
+    - {{ point | latex_escape }}{% if not loop.last or not is_last_item %}\\{% endif %}
+    {%- endfor -%}
+    {%- endfor -%}
+  {% elif section_id == 'projects' and data.show_sections.projects %}
+    \section{\textbf{Key Projects}}
+    {%- for item in data.projects -%}
+    \textbf{{ '{' }}{{ item.title | latex_escape }}{{ '}' }}{% if item.subtitle %} $\mid$ {{ item.subtitle | latex_escape }}{% endif %}\hfill\textit{{ '{' }}{{ item.duration | latex_escape }}{{ '}' }}{% if item.url %} \href{ {{- item.url | latex_url -}} }{\raisebox{-0.05\height}{\faGithub}}{% endif %}\\
+    {%- set is_last_item = loop.last -%}
+    {%- for point in item.points -%}
+    - {{ point | latex_escape }}{% if not loop.last or not is_last_item %}\\{% endif %}
+    {%- endfor -%}
+    {%- endfor -%}
+  {% elif section_id == 'skills' and data.show_sections.skills %}
+    \section{\textbf{Skills}}
+    {{ data.skills | latex_escape }}
+  {% elif section_id == 'scholastic' and data.show_sections.scholastic %}
+    \section{\textbf{Scholastic Achievements}}
+    {%- for item in data.scholastic_achievements -%}
+    - \textbf{{ '{' }}{{ item.title | latex_escape }}:{{ '}' }} {{ item.details | latex_escape }}{% if not loop.last %}\\{% endif %}
+    {% endfor -%}
+  {% elif section_id == 'courses' and data.show_sections.courses %}
+    \section{\textbf{Courses}}
+    {{ data.courses | latex_escape }}
+  {% elif section_id == 'organizations' and data.show_sections.organizations %}
+    \section{\textbf{Organizations/Extracurriculars}}
+    {%- for item in data.organizations -%}
+    - \textbf{{ '{' }}{{ item.title | latex_escape }}:{{ '}' }} {{ item.details | latex_escape }}{% if not loop.last %}\\{% endif %}
+    {% endfor -%}
+  {% endif %}
 {% endfor %}
-\end{tabularx}
-{% endif -%}
-
-{% if data.show_sections.experience %}
-\section{\textbf{Experience}}
-{%- for item in data.experience -%}
-\textbf{{ '{' }}{{ item.title | latex_escape }}{{ '}' }}: \textit{{ '{' }}{{ item.role | latex_escape }}{{ '}' }}\hfill\textit{{ '{' }}{{ item.duration | latex_escape }}{{ '}' }}\\
-{%- set is_last_item = loop.last -%}
-{%- for point in item.points -%}
-- {{ point | latex_escape }}{% if not loop.last or not is_last_item %}\\{% endif %}
-{%- endfor -%}
-{%- endfor -%}
-{%- endif -%}
-
-{% if data.show_sections.internships %}
-\section{\textbf{Internships}}
-{%- for item in data.internships -%}
-\textbf{{ '{' }}{{ item.title | latex_escape }}{{ '}' }}: \textit{{ '{' }}{{ item.role | latex_escape }}{{ '}' }}\hfill\textit{{ '{' }}{{ item.duration | latex_escape }}{{ '}' }}\\
-{%- set is_last_item = loop.last -%}
-{%- for point in item.points -%}
-- {{ point | latex_escape }}{% if not loop.last or not is_last_item %}\\{% endif %}
-{%- endfor -%}
-{%- endfor -%}
-{%- endif -%}
-
-{% if data.show_sections.projects %}
-\section{\textbf{Key Projects}}
-{%- for item in data.projects -%}
-\textbf{{ '{' }}{{ item.title | latex_escape }}{{ '}' }}{% if item.subtitle %} $\mid$ {{ item.subtitle | latex_escape }}{% endif %}\hfill\textit{{ '{' }}{{ item.duration | latex_escape }}{{ '}' }}{% if item.url %} \href{ {{- item.url | latex_url -}} }{\raisebox{-0.05\height}{\faGithub}}{% endif %}\\
-{%- set is_last_item = loop.last -%}
-{%- for point in item.points -%}
-- {{ point | latex_escape }}{% if not loop.last or not is_last_item %}\\{% endif %}
-{%- endfor -%}
-{%- endfor -%}
-{%- endif -%}
-
-{% if data.show_sections.skills %}
-\section{\textbf{Skills}}
-{{ data.skills | latex_escape }}
-{% endif %}
-
-{% if data.show_sections.scholastic %}
-\section{\textbf{Scholastic Achievements}}
-{%- for item in data.scholastic_achievements -%}
-- \textbf{{ '{' }}{{ item.title | latex_escape }}:{{ '}' }} {{ item.details | latex_escape }}{% if not loop.last %}\\{% endif %}
-{% endfor -%}
-{% endif %}
-
-{% if data.show_sections.courses %}
-\section{\textbf{Courses}}
-{{ data.courses | latex_escape }}
-{% endif %}
-
-{% if data.show_sections.organizations %}
-\section{\textbf{Organizations/Extracurriculars}}
-{%- for item in data.organizations -%}
-- \textbf{{ '{' }}{{ item.title | latex_escape }}:{{ '}' }} {{ item.details | latex_escape }}{% if not loop.last %}\\{% endif %}
-{% endfor -%}
-{% endif %}
 
 \vfill
 

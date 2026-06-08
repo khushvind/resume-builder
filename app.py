@@ -82,11 +82,12 @@ DEFAULT_DATA: dict[str, Any] = {
         }
     ],
     "scholastic_achievements": [
-        {"title": "JEE Advanced 2021", "details": "Secured an All India Rank of 302 among the selected pool of students."},
-        {"title": "KVPY Fellowship 2020", "details": "Conferred by IISc and DST, Government of India."},
+        {"title": "Academic Excellence Award", "details": "Awarded for outstanding academic performance during the 2023-24 session."},
+        {"title": "Merit Scholarship", "details": "Received a full-tuition scholarship for ranking among the top 1% of the department."},
     ],
     "organizations": [
-        {"title": "Mathematics Society, IIT Delhi", "details": "Coordinator (June 2023 - May 2024) - Responsible for coordinating various society events."},
+        {"title": "University Coding Club", "details": "Lead Coordinator - Responsible for organizing weekly coding workshops and annual hackathons."},
+        {"title": "Community Outreach Program", "details": "Volunteer - Mentored high school students in STEM subjects and career development."},
     ],
     "courses": "Introduction To Computer Science, Data Structures & Algorithms, Analysis & Design of Algorithms, Computer Architecture, Operating Systems",
     "skills": "Python, C/C++, Java, NumPy, Pandas, PyTorch, Git, Linux, Docker, LaTeX",
@@ -106,6 +107,16 @@ DEFAULT_DATA: dict[str, Any] = {
         "organizations": True,
         "courses": True,
     },
+    "section_order": [
+        "academic",
+        "experience",
+        "internships",
+        "projects",
+        "scholastic",
+        "courses",
+        "organizations",
+        "skills",
+    ],
 }
 
 
@@ -195,6 +206,7 @@ def sanitize_payload(payload: dict[str, Any]) -> dict[str, Any]:
         "skills": payload.get("skills") or DEFAULT_DATA["skills"],
         "show_contact": payload.get("show_contact") or {},
         "show_sections": payload.get("show_sections") or {},
+        "section_order": payload.get("section_order") or DEFAULT_DATA["section_order"],
     }
 
     data["skills"] = str(data["skills"])
@@ -206,6 +218,13 @@ def sanitize_payload(payload: dict[str, Any]) -> dict[str, Any]:
     merged_contact = dict(DEFAULT_DATA["show_contact"])
     merged_contact.update({k: bool(v) for k, v in data["show_contact"].items()})
     data["show_contact"] = merged_contact
+
+    if not isinstance(data["section_order"], list):
+        data["section_order"] = DEFAULT_DATA["section_order"]
+    else:
+        # Ensure we only have valid section keys
+        valid_keys = set(DEFAULT_DATA["section_order"])
+        data["section_order"] = [s for s in data["section_order"] if s in valid_keys]
 
     for key in ["academic_details", "experience", "internships", "projects", "scholastic_achievements", "organizations"]:
         if not isinstance(data[key], list):

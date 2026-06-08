@@ -41,6 +41,11 @@ function initIds() {
     showScholastic: $("show-scholastic"),
     showOrganizations: $("show-organizations"),
     showCourses: $("show-courses"),
+    reorderBtn: $("reorder-btn"),
+    reorderDialog: $("reorder-dialog"),
+    reorderList: $("reorder-list"),
+    closeReorder: $("close-reorder"),
+    sectionsContainer: $("sections-container"),
     form: $("resume-form"),
     appShell: document.querySelector(".app-shell"),
     panelResizer: $("panel-resizer"),
@@ -378,6 +383,11 @@ function loadDefaults() {
 
   if (ids.skills) ids.skills.value = defaults.skills || "";
   if (ids.courses) ids.courses.value = defaults.courses || "";
+
+  if (defaults.section_order) {
+    ids.sectionOrder = [...defaults.section_order];
+    reorderFormDOM();
+  }
 }
 
 function buildPayload() {
@@ -413,7 +423,100 @@ function buildPayload() {
       organizations: ids.showOrganizations?.checked ?? true,
       courses: ids.showCourses?.checked ?? true,
     },
+    section_order: ids.sectionOrder || [
+      "academic",
+      "experience",
+      "internships",
+      "projects",
+      "scholastic",
+      "courses",
+      "organizations",
+      "skills",
+    ],
   };
+}
+
+function reorderFormDOM() {
+  if (!ids.sectionsContainer || !ids.sectionOrder) return;
+  const container = ids.sectionsContainer;
+  const sections = [...container.querySelectorAll(".form-section")];
+  ids.sectionOrder.forEach((id) => {
+    const sectionEl = sections.find((el) => el.dataset.section === id);
+    if (sectionEl) container.appendChild(sectionEl);
+  });
+}
+
+function initReorderLogic() {
+  if (!ids.reorderBtn || !ids.reorderDialog) return;
+
+  ids.reorderBtn.addEventListener("click", () => {
+    renderReorderList();
+    ids.reorderDialog.showModal();
+  });
+
+  ids.closeReorder.addEventListener("click", () => {
+    ids.reorderDialog.close();
+  });
+}
+
+function renderReorderList() {
+  const list = ids.reorderList;
+  list.innerHTML = "";
+  
+  const order = ids.sectionOrder || [
+    "academic",
+    "experience",
+    "internships",
+    "projects",
+    "scholastic",
+    "courses",
+    "organizations",
+    "skills",
+  ];
+
+  order.forEach((id) => {
+    const li = document.createElement("li");
+    li.className = "reorder-item";
+    li.draggable = true;
+    li.dataset.id = id;
+    
+    const label = id.charAt(0).toUpperCase() + id.slice(1);
+    li.innerHTML = `
+      <span class="reorder-handle">☰</span>
+      <span class="reorder-text">${label}</span>
+    `;
+
+    li.addEventListener("dragstart", (e) => {
+      e.dataTransfer.setData("text/plain", id);
+      li.classList.add("dragging");
+    });
+
+    li.addEventListener("dragend", () => {
+      li.classList.remove("dragging");
+    });
+
+    list.appendChild(li);
+  });
+
+  list.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    const draggingItem = list.querySelector(".dragging");
+    const siblings = [...list.querySelectorAll(".reorder-item:not(.dragging)")];
+    
+    const nextSibling = siblings.find((sibling) => {
+      const box = sibling.getBoundingClientRect();
+      return e.clientY <= box.top + box.height / 2;
+    });
+    
+    list.insertBefore(draggingItem, nextSibling);
+  });
+
+  list.addEventListener("drop", () => {
+    const newOrder = [...list.querySelectorAll(".reorder-item")].map((li) => li.dataset.id);
+    ids.sectionOrder = newOrder;
+    reorderFormDOM();
+    scheduleRender();
+  });
 }
 
 let debounceHandle;
@@ -551,6 +654,7 @@ function wireEvents() {
 document.addEventListener("DOMContentLoaded", () => {
   initIds();
   initPanelResizer();
+  initReorderLogic();
   wireEvents();
   loadDefaults();
   scheduleRender();

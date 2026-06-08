@@ -5,6 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Resume Builder</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+    <style>
+      .modal { padding: 0; border: none; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
+      .modal::backdrop { background: rgba(0,0,0,0.5); }
+      .modal-content { padding: 24px; min-width: 320px; }
+      .reorder-list { list-style: none; padding: 0; margin: 16px 0; }
+      .reorder-item { display: flex; align-items: center; padding: 12px; background: #f8f9fa; border: 1px solid #dee2e6; margin-bottom: 8px; border-radius: 4px; cursor: grab; }
+      .reorder-item.dragging { opacity: 0.5; background: #e9ecef; }
+      .reorder-handle { margin-right: 12px; cursor: grab; font-size: 1.2rem; color: #6c757d; }
+      .reorder-text { font-weight: 500; }
+      .modal-actions { display: flex; justify-content: flex-end; margin-top: 16px; }
+    </style>
   </head>
   <body>
     <main class="app-shell">
@@ -41,77 +52,95 @@
             </label>
           </div>
 
-          <h2 class="section-heading">
-            <label class="section-toggle">
-              <span>Academic Details</span>
-              <input type="checkbox" id="show-academic" checked />
-            </label>
-            <button type="button" class="section-add" data-add-entry="academic" aria-label="Add academic">+</button>
-          </h2>
-          <p class="hint">Add one academic record at a time.</p>
-          <div id="academic-entries" class="entry-list" data-section="academic"></div>
+          <div id="sections-container">
+            <div class="form-section" data-section="academic">
+              <h2 class="section-heading">
+                <label class="section-toggle">
+                  <span>Academic Details</span>
+                  <input type="checkbox" id="show-academic" checked />
+                </label>
+                <button type="button" class="section-add" data-add-entry="academic" aria-label="Add academic">+</button>
+              </h2>
+              <p class="hint">Add one academic record at a time.</p>
+              <div id="academic-entries" class="entry-list" data-section="academic"></div>
+            </div>
 
-          <h2 class="section-heading">
-            <label class="section-toggle">
-              <span>Experience</span>
-              <input type="checkbox" id="show-experience" checked />
-            </label>
-            <button type="button" class="section-add" data-add-entry="experience" aria-label="Add experience">+</button>
-          </h2>
-          <p class="hint">Entry format (blank line separates entries):</p>
-          <div id="experience-entries" class="entry-list" data-section="experience"></div>
+            <div class="form-section" data-section="experience">
+              <h2 class="section-heading">
+                <label class="section-toggle">
+                  <span>Experience</span>
+                  <input type="checkbox" id="show-experience" checked />
+                </label>
+                <button type="button" class="section-add" data-add-entry="experience" aria-label="Add experience">+</button>
+              </h2>
+              <p class="hint">Entry format (blank line separates entries):</p>
+              <div id="experience-entries" class="entry-list" data-section="experience"></div>
+            </div>
 
-          <h2 class="section-heading">
-            <label class="section-toggle">
-              <span>Internships</span>
-              <input type="checkbox" id="show-internships" checked />
-            </label>
-            <button type="button" class="section-add" data-add-entry="internships" aria-label="Add internship">+</button>
-          </h2>
-          <div id="internships-entries" class="entry-list" data-section="internships"></div>
+            <div class="form-section" data-section="internships">
+              <h2 class="section-heading">
+                <label class="section-toggle">
+                  <span>Internships</span>
+                  <input type="checkbox" id="show-internships" checked />
+                </label>
+                <button type="button" class="section-add" data-add-entry="internships" aria-label="Add internship">+</button>
+              </h2>
+              <div id="internships-entries" class="entry-list" data-section="internships"></div>
+            </div>
 
-          <h2 class="section-heading">
-            <label class="section-toggle">
-              <span>Key Projects</span>
-              <input type="checkbox" id="show-projects" checked />
-            </label>
-            <button type="button" class="section-add" data-add-entry="projects" aria-label="Add project">+</button>
-          </h2>
-          <div id="project-entries" class="entry-list" data-section="projects"></div>
+            <div class="form-section" data-section="projects">
+              <h2 class="section-heading">
+                <label class="section-toggle">
+                  <span>Key Projects</span>
+                  <input type="checkbox" id="show-projects" checked />
+                </label>
+                <button type="button" class="section-add" data-add-entry="projects" aria-label="Add project">+</button>
+              </h2>
+              <div id="project-entries" class="entry-list" data-section="projects"></div>
+            </div>
 
-          <h2 class="section-heading">
-            <label class="section-toggle">
-              <span>Scholastic Achievements</span>
-              <input type="checkbox" id="show-scholastic" checked />
-            </label>
-            <button type="button" class="section-add" data-add-entry="scholastic" aria-label="Add achievement">+</button>
-          </h2>
-          <div id="scholastic-entries" class="entry-list" data-section="scholastic"></div>
+            <div class="form-section" data-section="scholastic">
+              <h2 class="section-heading">
+                <label class="section-toggle">
+                  <span>Scholastic Achievements</span>
+                  <input type="checkbox" id="show-scholastic" checked />
+                </label>
+                <button type="button" class="section-add" data-add-entry="scholastic" aria-label="Add achievement">+</button>
+              </h2>
+              <div id="scholastic-entries" class="entry-list" data-section="scholastic"></div>
+            </div>
 
-          <h2 class="section-heading">
-            <label class="section-toggle">
-              <span>Courses</span>
-              <input type="checkbox" id="show-courses" checked />
-            </label>
-          </h2>
-          <label>Courses <textarea id="courses" placeholder="Data Structures, Algorithms, Operating Systems..."></textarea></label>
+            <div class="form-section" data-section="courses">
+              <h2 class="section-heading">
+                <label class="section-toggle">
+                  <span>Courses</span>
+                  <input type="checkbox" id="show-courses" checked />
+                </label>
+              </h2>
+              <label>Courses <textarea id="courses" placeholder="Data Structures, Algorithms, Operating Systems..."></textarea></label>
+            </div>
 
-          <h2 class="section-heading">
-            <label class="section-toggle">
-              <span>Organizations/Extracurriculars</span>
-              <input type="checkbox" id="show-organizations" checked />
-            </label>
-            <button type="button" class="section-add" data-add-entry="organizations" aria-label="Add organization">+</button>
-          </h2>
-          <div id="organizations-entries" class="entry-list" data-section="organizations"></div>
+            <div class="form-section" data-section="organizations">
+              <h2 class="section-heading">
+                <label class="section-toggle">
+                  <span>Organizations/Extracurriculars</span>
+                  <input type="checkbox" id="show-organizations" checked />
+                </label>
+                <button type="button" class="section-add" data-add-entry="organizations" aria-label="Add organization">+</button>
+              </h2>
+              <div id="organizations-entries" class="entry-list" data-section="organizations"></div>
+            </div>
 
-          <h2 class="section-heading">
-            <label class="section-toggle">
-              <span>Skills</span>
-              <input type="checkbox" id="show-skills" checked />
-            </label>
-          </h2>
-          <label>Skills <textarea id="skills" placeholder="Python, JavaScript, React, Flask, SQL, Git"></textarea></label>
+            <div class="form-section" data-section="skills">
+              <h2 class="section-heading">
+                <label class="section-toggle">
+                  <span>Skills</span>
+                  <input type="checkbox" id="show-skills" checked />
+                </label>
+              </h2>
+              <label>Skills <textarea id="skills" placeholder="Python, JavaScript, React, Flask, SQL, Git"></textarea></label>
+            </div>
+          </div>
 
           <div class="actions" aria-hidden="true"></div>
         </form>
@@ -130,6 +159,7 @@
       <section class="panel preview-panel">
         <div class="preview-header">
           <div class="preview-actions">
+            <button type="button" id="reorder-btn" class="button secondary">Reorder Sections</button>
             <button id="render-top" class="button">Render Preview</button>
             <a id="download-link" class="button secondary" href="#" target="_blank" rel="noopener">Download PDF</a>
           </div>
@@ -138,6 +168,17 @@
         <iframe id="pdf-frame" title="Resume PDF preview"></iframe>
       </section>
     </main>
+
+    <dialog id="reorder-dialog" class="modal">
+      <div class="modal-content">
+        <h3>Reorder Sections</h3>
+        <p class="hint">Drag and drop sections to change their order.</p>
+        <ul id="reorder-list" class="reorder-list"></ul>
+        <div class="modal-actions">
+          <button type="button" id="close-reorder" class="button">Done</button>
+        </div>
+      </div>
+    </dialog>
 
     <script>
       window.DEFAULTS = {{ default_data | tojson }};
