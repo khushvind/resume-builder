@@ -17,7 +17,14 @@ A Python + LaTeX resume builder that keeps the output style close to the referen
 ## Requirements
 - Python 3.10+
 - A TeX distribution with `pdflatex` in PATH:
-  - Windows: MiKTeX or TeX Live
+
+## Run with Docker (Recommended)
+The easiest way to run the app is using Docker, which bundles all LaTeX dependencies:
+```powershell
+docker build -t resume-builder .
+docker run -d -p 80:5000 --name resume-builder-app resume-builder
+```
+Then open http://localhost.
 
 ## Run locally
 ```powershell
