@@ -41,7 +41,8 @@ Then open http://127.0.0.1:5000.
 ```powershell
 cd e:\Projects\resume-builder
 .\.venv\Scripts\Activate.ps1
-python -m unittest discover -s tests -p "test_*.py"
+```powershell
+python -m pytest
 ```
 
 ## Notes

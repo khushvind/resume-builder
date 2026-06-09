@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import re
 import shutil
+import time
 import subprocess
 import tempfile
 import uuid
@@ -332,6 +333,19 @@ def create_app() -> Flask:
     app.jinja_env.filters["latex_escape"] = latex_escape
     app.jinja_env.filters["latex_url"] = latex_url
     app.jinja_env.filters["profile_username"] = profile_username
+
+    @app.before_request
+    def cleanup_old_pdfs():
+        """Delete PDFs older than 1 hour to save disk space."""
+        now = time.time()
+        cutoff = now - 3600  # 1 hour
+        try:
+            for f in OUTPUT_DIR.glob("*.pdf"):
+                if f.stat().st_mtime < cutoff:
+                    f.unlink()
+        except Exception as e:
+            # Log error but don't crash the request
+            app.logger.error(f"Cleanup failed: {e}")
 
     @app.get("/")
     def index() -> str:
